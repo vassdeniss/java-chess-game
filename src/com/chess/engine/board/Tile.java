@@ -15,7 +15,7 @@ public abstract class Tile {
     // final - once set it cannot be overwritten
 
     // Dictionary basically
-    private static final Map<Integer, EmptyTile> EMPTY_TILES = createAllEmptyTiles();
+    private static final Map<Integer, EmptyTile> EMPTY_TILES_CACHE = createAllEmptyTiles();
 
     // Method to set empty tiles on grid
     private static Map<Integer, EmptyTile> createAllEmptyTiles() {
@@ -33,7 +33,7 @@ public abstract class Tile {
 
     // The only constructor than will be used
     public static Tile createTile(final int coordinate, final Piece piece) {
-        return piece != null ? new OccupiedTile(coordinate, piece) : EMPTY_TILES.get(coordinate);
+        return piece != null ? new OccupiedTile(coordinate, piece) : EMPTY_TILES_CACHE.get(coordinate);
     }
 
     // Constructor for setting location
@@ -47,7 +47,7 @@ public abstract class Tile {
     public abstract Piece getPiece();
 
     public static final class EmptyTile extends Tile {
-        EmptyTile(int coordinate) {
+        private EmptyTile(int coordinate) {
             super(coordinate);
         }
 
@@ -69,7 +69,7 @@ public abstract class Tile {
         // private - only for this subclass
         private final Piece tilePiece;
 
-        OccupiedTile(int coordinate, Piece tilePiece) {
+        private OccupiedTile(int coordinate, Piece tilePiece) {
             super(coordinate);
             this.tilePiece = tilePiece;
         }
