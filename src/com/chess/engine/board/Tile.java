@@ -23,7 +23,7 @@ public abstract class Tile {
         final Map<Integer, EmptyTile> tileMap = new HashMap<>();
 
         // Loop 64 times (chess grid = 8x8) and put each number in the dictionary
-        for (int i = 0; i < 64; i++) {
+        for (int i = 0; i < BoardUtils.TILES; i++) {
             tileMap.put(i, new EmptyTile(i));
         }
 
@@ -37,9 +37,7 @@ public abstract class Tile {
     }
 
     // Constructor for setting location
-    private Tile(final int tileCoordinate) {
-        this.tileCoordinate = tileCoordinate;
-    }
+    private Tile(final int tileCoordinate) { this.tileCoordinate = tileCoordinate; }
 
     // True or false depending if piece is on tile
     // Get the piece if its occupied
@@ -47,21 +45,15 @@ public abstract class Tile {
     public abstract Piece getPiece();
 
     public static final class EmptyTile extends Tile {
-        private EmptyTile(int coordinate) {
-            super(coordinate);
-        }
+        private EmptyTile(int coordinate) { super(coordinate); }
 
         // Return false - no piece on empty tile
         @Override
-        public boolean isTileOccupied() {
-            return false;
-        }
+        public boolean isTileOccupied() { return false; }
 
         // Return null - no piece on empty tile
         @Override
-        public Piece getPiece() {
-            return null;
-        }
+        public Piece getPiece() { return null; }
     }
 
     public static final class OccupiedTile extends Tile {
@@ -69,21 +61,17 @@ public abstract class Tile {
         // private - only for this subclass
         private final Piece tilePiece;
 
-        private OccupiedTile(int coordinate, Piece tilePiece) {
+        private OccupiedTile(int coordinate, final Piece tilePiece) {
             super(coordinate);
             this.tilePiece = tilePiece;
         }
 
         // Return true - there will be always a piece on the tile
         @Override
-        public boolean isTileOccupied() {
-            return true;
-        }
+        public boolean isTileOccupied() { return true; }
 
         // Return tilePiece - there will be always a piece on the tile
         @Override
-        public Piece getPiece() {
-            return this.tilePiece;
-        }
+        public Piece getPiece() { return this.tilePiece; }
     }
 }

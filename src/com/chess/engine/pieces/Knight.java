@@ -20,7 +20,7 @@ public class Knight extends Piece {
     }
 
     @Override
-    public Collection<Move> legalMoves(Board board) {
+    public Collection<Move> legalMoves(final Board board) {
         final List<Move> legalMoves = new ArrayList<>();
 
         // Loop through the array mentioned on top
@@ -40,7 +40,11 @@ public class Knight extends Piece {
 
                 // if it is not occupied add a normal move
                 if (!possibleDestinationTile.isTileOccupied()) {
-                    legalMoves.add(new Move());
+                    legalMoves.add(new Move.NormalMove(
+                            board,
+                            this,
+                            possibleDestinationCoordinates)
+                    );
                 // else get the tile piece color and type...
                 } else {
                     final Piece pieceAtDestination = possibleDestinationTile.getPiece();
@@ -48,7 +52,12 @@ public class Knight extends Piece {
 
                     // and if its a different color add an attack move
                     if (pieceAlliance != this.pieceAlliance) {
-                        legalMoves.add(new Move());
+                        legalMoves.add(new Move.AttackMove(
+                                board,
+                                this,
+                                possibleDestinationCoordinates,
+                                pieceAtDestination)
+                        );
                     }
                 }
             }
