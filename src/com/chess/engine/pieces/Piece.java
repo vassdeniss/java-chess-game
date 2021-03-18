@@ -4,7 +4,7 @@ import com.chess.engine.Alliance;
 import com.chess.engine.board.Board;
 import com.chess.engine.board.Move;
 
-import java.util.List;
+import java.util.Collection;
 
 public abstract class Piece {
     // Set int for the position of the piece on the board
@@ -18,7 +18,12 @@ public abstract class Piece {
         this.pieceAlliance = pieceAlliance;
     }
 
+    // Method for taking the pieces color
+    public Alliance getPieceAlliance() {
+        return this.pieceAlliance;
+    }
+
     // Abstract list each piece will inherit and each will be filled
     // with legal moves for the specific piece
-    public abstract List<Move> legalMoves(final Board board);
+    public abstract Collection<Move> legalMoves(final Board board);
 }
