@@ -12,6 +12,9 @@ import java.util.Collection;
 import java.util.List;
 
 public class Queen extends Piece {
+    // For an explanation of the Queen Class
+    // please refer to the Bishop Class
+
     private static final int[] POSSIBLE_MOVE_VECTOR_COORDINATES = {-9, -8, -7, -1, 1, 7, 8, 9};
 
     Queen(int piecePosition, Alliance pieceAlliance) {
@@ -64,6 +67,7 @@ public class Queen extends Piece {
         return ImmutableList.copyOf(legalMoves);
     }
 
+    // Queen Exclusions
     private static boolean isFirstColumnExclusion(final int currentPosition, final int possibleOffset) {
         return BoardUtils.FIRST_COLUMN[currentPosition] && (
                 possibleOffset == -9
