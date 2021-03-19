@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static com.chess.engine.board.Move.*;
+
 public class Knight extends Piece {
     // int array for possible knight moves
     private final static int[] POSSIBLE_MOVE_COORDINATES = {-17, -15, -10, -6, 6, 10, 15, 17};
@@ -40,7 +42,7 @@ public class Knight extends Piece {
 
                 // if it is not occupied add a normal move
                 if (!possibleDestinationTile.isTileOccupied()) {
-                    legalMoves.add(new Move.NormalMove(
+                    legalMoves.add(new NormalMove(
                             board,
                             this,
                             possibleDestinationCoordinates)
@@ -52,7 +54,7 @@ public class Knight extends Piece {
 
                     // and if its a different color add an attack move
                     if (pieceAlliance != this.pieceAlliance) {
-                        legalMoves.add(new Move.AttackMove(
+                        legalMoves.add(new AttackMove(
                                 board,
                                 this,
                                 possibleDestinationCoordinates,
