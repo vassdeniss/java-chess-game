@@ -25,6 +25,10 @@ public class BoardUtils {
     public static final boolean[] SEVENTH_COLUMN = initColumn(6);
     public static final boolean[] EIGHT_COLUMN = initColumn(7);
 
+    // Declaring boolean arrays for pawns
+    public static final boolean[] SECOND_ROW = null;
+    public static final boolean[] SEVENTH_ROW = null;
+
     // Throw a runtime exception on instance of class
     private BoardUtils() { throw new RuntimeException("You cannot instance me!"); }
 
