@@ -11,13 +11,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class Rook extends Piece {
-    // For an explanation of the Rook Class
-    // please refer to the Bishop Class
+public class Queen extends Piece {
+    private static final int[] POSSIBLE_MOVE_VECTOR_COORDINATES = {-9, -8, -7, -1, 1, 7, 8, 9};
 
-    private static final int[] POSSIBLE_MOVE_VECTOR_COORDINATES = {-8, -1, 1, 8};
-
-    Rook(int piecePosition, Alliance pieceAlliance) {
+    Queen(int piecePosition, Alliance pieceAlliance) {
         super(piecePosition, pieceAlliance);
     }
 
@@ -67,12 +64,19 @@ public class Rook extends Piece {
         return ImmutableList.copyOf(legalMoves);
     }
 
-    // Rook Exclusions
     private static boolean isFirstColumnExclusion(final int currentPosition, final int possibleOffset) {
-        return BoardUtils.FIRST_COLUMN[currentPosition] && (possibleOffset == -1);
+        return BoardUtils.FIRST_COLUMN[currentPosition] && (
+                possibleOffset == -9
+                || possibleOffset == 7
+                || possibleOffset == -1
+        );
     }
 
     private static boolean isEightColumnExclusion(final int currentPosition, final int possibleOffset) {
-        return BoardUtils.EIGHT_COLUMN[currentPosition] && (possibleOffset == 1);
+        return BoardUtils.EIGHT_COLUMN[currentPosition] && (
+                possibleOffset == 9
+                || possibleOffset == -7
+                || possibleOffset == 1
+        );
     }
 }
