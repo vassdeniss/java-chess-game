@@ -56,7 +56,7 @@ public class Pawn extends Piece {
                 }
             // If the attack is 7 (diagonal attack right)
             // and if the piece is white and not on the eight column (impossible diagonal attack)
-            // and if the piece is black and not on the first column (impossible diagonal attack)
+            // or if the piece is black and not on the first column (impossible diagonal attack)
             // continue
             } else if (currentPossibleMove == 7 &&
                     !((BoardUtils.EIGHT_COLUMN[this.piecePosition] && this.pieceAlliance.isWhite()) ||
@@ -72,7 +72,7 @@ public class Pawn extends Piece {
                 }
             // If the attack is 9 (diagonal attack left)
             // and if the piece is white and not on the first column (impossible diagonal attack)
-            // and if the piece is black and not on the eight column (impossible diagonal attack)
+            // or if the piece is black and not on the eight column (impossible diagonal attack)
             // continue
             } else if (currentPossibleMove == 9 &&
                     !((BoardUtils.EIGHT_COLUMN[this.piecePosition] && this.pieceAlliance.isBlack()) ||
