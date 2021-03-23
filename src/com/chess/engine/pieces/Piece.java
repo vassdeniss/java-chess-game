@@ -21,6 +21,11 @@ public abstract class Piece {
         this.isFirstMove = false;
     }
 
+    // Method for taking piece position
+    public int getPiecePosition() {
+        return this.piecePosition;
+    }
+
     // Method for taking the pieces color
     public Alliance getPieceAlliance() {
         return this.pieceAlliance;

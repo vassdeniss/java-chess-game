@@ -35,7 +35,7 @@ public class King extends Piece {
             }
 
             if (BoardUtils.isValidTileCoordinate(possibleDestinationCoordinate)) {
-                final Tile possibleDestinationTile = board.getTile(possibleDestinationCoordinates);
+                final Tile possibleDestinationTile = board.getTile(possibleDestinationCoordinate);
                 if (!possibleDestinationTile.isTileOccupied()) {
                     legalMoves.add(new NormalMove(
                             board,
