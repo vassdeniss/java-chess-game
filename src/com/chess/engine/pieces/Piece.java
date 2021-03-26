@@ -39,4 +39,24 @@ public abstract class Piece {
     // Abstract list each piece will inherit and each will be filled
     // with legal moves for the specific piece
     public abstract Collection<Move> legalMoves(final Board board);
+
+    public enum pieceType {
+        PAWN("P"),
+        KNIGHT("N"),
+        BISHOP("B"),
+        ROOK("R"),
+        QUEEN("Q"),
+        KING("k");
+
+        private String pieceName;
+
+        pieceType(final String pieceName) {
+            this.pieceName = pieceName;
+        }
+
+        @Override
+        public String toString() {
+            return this.pieceName;
+        }
+    }
 }

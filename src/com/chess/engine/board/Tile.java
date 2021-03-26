@@ -47,6 +47,12 @@ public abstract class Tile {
     public static final class EmptyTile extends Tile {
         private EmptyTile(int coordinate) { super(coordinate); }
 
+        // Return a dash if the tile is empty
+        @Override
+        public String toString() {
+            return "-";
+        }
+
         // Return false - no piece on empty tile
         @Override
         public boolean isTileOccupied() { return false; }
@@ -64,6 +70,15 @@ public abstract class Tile {
         private OccupiedTile(int coordinate, final Piece tilePiece) {
             super(coordinate);
             this.tilePiece = tilePiece;
+        }
+
+        // If the piece is black return lowercase letter else return uppercase later
+        // (based on enum in the Piece Class)
+        @Override
+        public String toString() {
+            return getPiece().getPieceAlliance().isBlack()
+                    ? getPiece().toString().toLowerCase()
+                    : getPiece().toString();
         }
 
         // Return true - there will be always a piece on the tile

@@ -4,10 +4,7 @@ import com.chess.engine.Alliance;
 import com.chess.engine.pieces.*;
 import com.google.common.collect.ImmutableList;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Board {
     // List of tiles for the game board
@@ -21,10 +18,47 @@ public class Board {
         this.gameBoard = createGameBoard(builder);
         this.whitePieces = calculateActivePieces(this.gameBoard, Alliance.WHITE);
         this.blackPieces = calculateActivePieces(this.gameBoard, Alliance.BLACK);
+        final Collection<Move> standardWhiteMoves = calculateLegalMoves(this.whitePieces);
+        final Collection<Move> standardBlackMoves = calculateLegalMoves(this.blackPieces);
     }
 
-    // method for taking the pieces on the board
-    private Collection<Piece> calculateActivePieces(final List<Tile> gameBoard, final Alliance alliance) {
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+
+        // Loop through the board
+        for (int i = 0; i < BoardUtils.TILES; i++) {
+            // Method field for getting the pieces letter
+            final String tileText = this.gameBoard.get(i).toString();
+            // append the empty tile or the piece letter
+            // seperate by 3 spaces
+            sb.append(String.format("%3s", tileText));
+
+            // if i becomes 8 the modulus would be 0
+            // i.e the row ended
+            // add a new line
+            if ((i + 1) % BoardUtils.TILES_ROW == 0) {
+                sb.append("\n");
+            }
+        }
+
+        return sb.toString();
+    }
+
+    // Method for making a list of all legal moves by looping through
+    // the pieces and taking each ones moves and adding it to a list
+    private Collection<Move> calculateLegalMoves(final Collection<Piece> pieces) {
+        final List<Move> legalMoves = new ArrayList<>();
+
+        for (Piece piece : pieces) {
+            legalMoves.addAll(piece.legalMoves(this));
+        }
+
+        return ImmutableList.copyOf(legalMoves);
+    }
+
+    // Method for taking the pieces on the board
+    private static Collection<Piece> calculateActivePieces(final List<Tile> gameBoard, final Alliance alliance) {
         // List of active pieces
         final List<Piece> activePieces = new ArrayList<>();
         // For loop for going trough every single tile on the board
@@ -119,9 +153,8 @@ public class Board {
         Alliance nextMoveDecider;
 
         // Constructor
-        // STUB
         public Builder() {
-
+            this.boardConfiguration = new HashMap<>();
         }
 
         // Method for setting the piece and the position of it

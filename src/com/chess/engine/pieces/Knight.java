@@ -69,6 +69,11 @@ public class Knight extends Piece {
         return ImmutableList.copyOf(legalMoves);
     }
 
+    @Override
+    public String toString() {
+        return pieceType.KNIGHT.toString();
+    }
+
     // Knight Exclusions
     private static boolean isFirstColumnExclusion(final int currentPosition, final int possibleOffset) {
         return BoardUtils.FIRST_COLUMN[currentPosition] && (
@@ -89,14 +94,14 @@ public class Knight extends Piece {
     private static boolean isSeventhColumnExclusion(final int currentPosition, final int possibleOffset) {
         return BoardUtils.SEVENTH_COLUMN[currentPosition] && (
                 possibleOffset == -6
-                || (possibleOffset == 10
+                || possibleOffset == 10
         );
     }
 
     private static boolean isEightColumnExclusion(final int currentPosition, final int possibleOffset) {
         return BoardUtils.EIGHT_COLUMN[currentPosition] && (
                 possibleOffset == 10
-                || (possibleOffset == 17
+                || possibleOffset == 17
         );
     }
 }
