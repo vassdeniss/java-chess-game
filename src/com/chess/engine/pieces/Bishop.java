@@ -18,7 +18,7 @@ public class Bishop extends Piece {
     // from current position to get one of the possible diagonal vectors
     private static final int[] POSSIBLE_MOVE_VECTOR_COORDINATES = {-9, -7, 7, 9};
 
-    Bishop(final int piecePosition, final Alliance pieceAlliance) {
+    public Bishop(final int piecePosition, final Alliance pieceAlliance) {
         super(piecePosition, pieceAlliance);
     }
 
