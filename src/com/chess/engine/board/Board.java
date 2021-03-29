@@ -2,6 +2,8 @@ package com.chess.engine.board;
 
 import com.chess.engine.Alliance;
 import com.chess.engine.pieces.*;
+import com.chess.engine.player.BlackPlayer;
+import com.chess.engine.player.WhitePlayer;
 import com.google.common.collect.ImmutableList;
 
 import java.util.*;
@@ -12,6 +14,9 @@ public class Board {
     // Collection of white || black pieces
     private final Collection<Piece> whitePieces;
     private final Collection<Piece> blackPieces;
+    // Method fields for both players
+    private final WhitePlayer whitePlayer;
+    private final BlackPlayer blackPlayer;
 
     // Board Constructor
     private Board(Builder builder) {
@@ -20,6 +25,8 @@ public class Board {
         this.blackPieces = calculateActivePieces(this.gameBoard, Alliance.BLACK);
         final Collection<Move> standardWhiteMoves = calculateLegalMoves(this.whitePieces);
         final Collection<Move> standardBlackMoves = calculateLegalMoves(this.blackPieces);
+        this.whitePlayer = new WhitePlayer(this, standardWhiteMoves, standardBlackMoves);
+        this.blackPlayer = new BlackPlayer(this, standardWhiteMoves, standardBlackMoves);
     }
 
     @Override
@@ -31,7 +38,7 @@ public class Board {
             // Method field for getting the pieces letter
             final String tileText = this.gameBoard.get(i).toString();
             // append the empty tile or the piece letter
-            // seperate by 3 spaces
+            // separate by 3 spaces
             sb.append(String.format("%3s", tileText));
 
             // if i becomes 8 the modulus would be 0
@@ -43,6 +50,16 @@ public class Board {
         }
 
         return sb.toString();
+    }
+
+    // Returns the collection of black pieces
+    public Collection<Piece> getBlackPieces() {
+        return this.blackPieces;
+    }
+
+    // Returns the collection of white pieces
+    public Collection<Piece> getWhitePieces() {
+        return this.whitePieces;
     }
 
     // Method for making a list of all legal moves by looping through
@@ -171,8 +188,6 @@ public class Board {
         }
 
         // Return the built board
-        public Board build() {
-            return new Board(this);
-        }
+        public Board build() { return new Board(this); }
     }
 }
