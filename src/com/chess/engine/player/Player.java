@@ -1,5 +1,6 @@
 package com.chess.engine.player;
 
+import com.chess.engine.Alliance;
 import com.chess.engine.board.Board;
 import com.chess.engine.board.Move;
 import com.chess.engine.pieces.King;
@@ -32,5 +33,43 @@ public abstract class Player {
         throw new RuntimeException("Not a valid board!");
     }
 
+    // Method for checking is a move is contained in
+    // the collection of moves
+    // STUB
+    public boolean isMoveLegal(final Move move) {
+        return this.legalMoves.contains(move);
+    }
+
+    // Method for checking if you're in check
+    // STUB
+    public boolean isInCheck() {
+        return false;
+    }
+
+    // Method for checking if you're in checkmate
+    // STUB
+    public boolean isInCheckMate() {
+        return false;
+    }
+
+    // Method for checking if you're in stalemate
+    // STUB
+    public boolean isInStaleMate() {
+        return false;
+    }
+
+    // Method for checking if you're castled
+    // STUB
+    public boolean isCastled() {
+        return false;
+    }
+
+    public MakeTransition makeMove(final Move move) {
+        return null;
+
+    }
+
     public abstract Collection<Piece> getActivePieces();
+    public abstract Alliance getAlliance();
+    public abstract Player getOpponent();
 }
