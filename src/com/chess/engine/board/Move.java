@@ -15,6 +15,10 @@ public abstract class Move {
         this.destinationCoordinates = destinationCoordinates;
     }
 
+    public int getDestinationCoordinate() {
+        return this.destinationCoordinates;
+    }
+
     // NormalMove class for legal moves that just moves the piece
     public static final class NormalMove extends Move {
         public NormalMove(final Board board,

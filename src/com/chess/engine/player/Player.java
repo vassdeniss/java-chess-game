@@ -5,13 +5,17 @@ import com.chess.engine.board.Board;
 import com.chess.engine.board.Move;
 import com.chess.engine.pieces.King;
 import com.chess.engine.pieces.Piece;
+import com.google.common.collect.ImmutableList;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public abstract class Player {
     protected final Board board;
     protected final King playerKing;
     protected final Collection<Move> legalMoves;
+    private final boolean isInCheck;
 
     Player(final Board board,
            final Collection<Move> legalMoves,
@@ -19,6 +23,24 @@ public abstract class Player {
         this.board = board;
         this.playerKing = establishKing();
         this.legalMoves = legalMoves;
+        this.isInCheck = !Player.calculateAttackOnTile(this.playerKing.getPiecePosition(), opponentMoves).isEmpty();
+    }
+
+    // Method for calculating check
+    // Pass in the player's king position and a collection of all possible enemy moves
+    // If an enemy move overlaps the king's tile position
+    // Add it to the attack moves list and return it
+    // If the list is not empty the player is in check
+    private static Collection<Move> calculateAttackOnTile(int piecePosition, Collection<Move> moves) {
+        final List<Move> attackMoves = new ArrayList<>();
+
+        for (final Move move : moves) {
+            if (piecePosition == move.getDestinationCoordinate()) {
+                attackMoves.add(move);
+            }
+        }
+
+        return ImmutableList.copyOf(attackMoves);
     }
 
     // Method for looping through the active pieces
@@ -36,37 +58,40 @@ public abstract class Player {
     // Method for checking is a move is contained in
     // the collection of moves
     // STUB
-    public boolean isMoveLegal(final Move move) {
-        return this.legalMoves.contains(move);
-    }
+    public boolean isMoveLegal(final Move move) { return this.legalMoves.contains(move); }
 
     // Method for checking if you're in check
-    // STUB
-    public boolean isInCheck() {
-        return false;
-    }
+    public boolean isInCheck() { return this.isInCheck; }
 
     // Method for checking if you're in checkmate
-    // STUB
-    public boolean isInCheckMate() {
+    public boolean isInCheckMate() { return this.isInCheck && !hasEscapeMoves(); }
+
+    // Method for checking escape moves in case of checkmate
+    // Loop through our possible moves
+    // Make the move on a new off-game board
+    // If the move succeeds the checkmate is escapable
+    // Otherwise it is not escapable if the move fails
+    private boolean hasEscapeMoves() {
+        for (final Move move : legalMoves) {
+            final MakeTransition transition = makeMove(move);
+
+            if (transition.getMoveStatus().isDone()) {
+                return true;
+            }
+        }
+
         return false;
     }
 
     // Method for checking if you're in stalemate
-    // STUB
-    public boolean isInStaleMate() {
-        return false;
-    }
+    public boolean isInStaleMate() { return !isInCheck && !hasEscapeMoves(); }
 
     // Method for checking if you're castled
     // STUB
-    public boolean isCastled() {
-        return false;
-    }
+    public boolean isCastled() { return false; }
 
     public MakeTransition makeMove(final Move move) {
         return null;
-
     }
 
     public abstract Collection<Piece> getActivePieces();
