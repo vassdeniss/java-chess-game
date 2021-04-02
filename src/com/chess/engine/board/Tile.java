@@ -7,14 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class Tile {
-    // Int for tile location
-    // int tileCoordinate - mutable - not good for a lot of reasons
-    // i.e (garbage collection, memory etc...)
     protected final int tileCoordinate;
-    // Protected i.e only subclases can access it
-    // final - once set it cannot be overwritten
 
-    // Dictionary basically
     private static final Map<Integer, EmptyTile> EMPTY_TILES_CACHE = createAllEmptyTiles();
 
     // Method to set empty tiles on grid
@@ -49,9 +43,7 @@ public abstract class Tile {
 
         // Return a dash if the tile is empty
         @Override
-        public String toString() {
-            return "-";
-        }
+        public String toString() { return "-"; }
 
         // Return false - no piece on empty tile
         @Override

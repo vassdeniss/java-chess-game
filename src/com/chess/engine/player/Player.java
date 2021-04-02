@@ -26,6 +26,12 @@ public abstract class Player {
         this.isInCheck = !Player.calculateAttackOnTile(this.playerKing.getPiecePosition(), opponentMoves).isEmpty();
     }
 
+    // Expose player king
+    public King getPlayerKing() { return this.playerKing; }
+
+    // Expose own legal moves
+    public Collection<Move> getLegalMoves() { return this.legalMoves; }
+
     // Method for calculating check
     // Pass in the player's king position and a collection of all possible enemy moves
     // If an enemy move overlaps the king's tile position
@@ -90,8 +96,28 @@ public abstract class Player {
     // STUB
     public boolean isCastled() { return false; }
 
+    // Method for making the move
+    // If the move is illegal return the same board
+    // Check if the enemy player will be in check if he makes the move
+    // and if he is return the same board
+    // Otherwise make the move and return a new board
     public MakeTransition makeMove(final Move move) {
-        return null;
+        if (!isMoveLegal(move)) {
+            return new MakeTransition(this.board, move, MoveStatus.ILLEGAL);
+        }
+
+        final Board transitionBoard = move.execute();
+
+        final Collection<Move> kingAttacks = Player.calculateAttackOnTile(transitionBoard
+                .currentPlayer().getPlayerKing().getPiecePosition(),
+                transitionBoard.currentPlayer().getLegalMoves()
+        );
+
+        if (!kingAttacks.isEmpty()) {
+            return new MakeTransition(this.board, move, MoveStatus.CHECK);
+        }
+
+        return new MakeTransition(transitionBoard, move, MoveStatus.DONE);
     }
 
     public abstract Collection<Piece> getActivePieces();

@@ -62,9 +62,7 @@ public class King extends Piece {
     }
 
     @Override
-    public String toString() {
-        return pieceType.KING.toString();
-    }
+    public String toString() { return pieceType.KING.toString(); }
 
     // King Exclusions
     private static boolean isFirstColumnExclusion(final int currentPosition, final int possibleOffset) {

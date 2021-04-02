@@ -75,9 +75,7 @@ public class Bishop extends Piece {
     }
 
     @Override
-    public String toString() {
-        return pieceType.BISHOP.toString();
-    }
+    public String toString() { return pieceType.BISHOP.toString(); }
 
     // Bishop Exclusions
     private static boolean isFirstColumnExclusion(final int currentPosition, final int possibleOffset) {

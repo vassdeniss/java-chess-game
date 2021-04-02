@@ -15,9 +15,10 @@ public abstract class Move {
         this.destinationCoordinates = destinationCoordinates;
     }
 
-    public int getDestinationCoordinate() {
-        return this.destinationCoordinates;
-    }
+    // Expose destination coordinates
+    public int getDestinationCoordinate() { return this.destinationCoordinates; }
+
+    public abstract Board execute();
 
     // NormalMove class for legal moves that just moves the piece
     public static final class NormalMove extends Move {
@@ -25,6 +26,11 @@ public abstract class Move {
                           final Piece movedPiece,
                           final int destinationCoordinates) {
             super(board, movedPiece, destinationCoordinates);
+        }
+
+        @Override
+        public Board execute() {
+            return null;
         }
     }
 
@@ -39,6 +45,11 @@ public abstract class Move {
                           final Piece attackedPiece) {
             super(board, movedPiece, destinationCoordinates);
             this.attackedPiece = attackedPiece;
+        }
+
+        @Override
+        public Board execute() {
+            return null;
         }
     }
 }

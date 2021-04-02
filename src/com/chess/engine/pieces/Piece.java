@@ -25,23 +25,15 @@ public abstract class Piece {
     }
 
     // Method for taking piece position
-    public int getPiecePosition() {
-        return this.piecePosition;
-    }
+    public int getPiecePosition() { return this.piecePosition; }
 
     // Method for taking the pieces color
-    public Alliance getPieceAlliance() {
-        return this.pieceAlliance;
-    }
+    public Alliance getPieceAlliance() { return this.pieceAlliance; }
 
     // Method for returning first move boolean
-    public boolean isFirstMove() {
-        return this.isFirstMove;
-    }
+    public boolean isFirstMove() { return this.isFirstMove; }
 
-    public PieceType getPieceType() {
-        return this.pieceType;
-    }
+    public PieceType getPieceType() { return this.pieceType; }
 
     // Abstract list each piece will inherit and each will be filled
     // with legal moves for the specific piece
@@ -50,51 +42,35 @@ public abstract class Piece {
     public enum PieceType {
         PAWN("P") {
             @Override
-            public boolean isKing() {
-                return false;
-            }
+            public boolean isKing() { return false; }
         },
         KNIGHT("N") {
             @Override
-            public boolean isKing() {
-                return false;
-            }
+            public boolean isKing() { return false; }
         },
         BISHOP("B") {
             @Override
-            public boolean isKing() {
-                return false;
-            }
+            public boolean isKing() { return false; }
         },
         ROOK("R") {
             @Override
-            public boolean isKing() {
-                return false;
-            }
+            public boolean isKing() { return false; }
         },
         QUEEN("Q") {
             @Override
-            public boolean isKing() {
-                return false;
-            }
+            public boolean isKing() { return false; }
         },
         KING("k") {
             @Override
-            public boolean isKing() {
-                return true;
-            }
+            public boolean isKing() { return true; }
         };
 
         private String pieceName;
 
-        PieceType(final String pieceName) {
-            this.pieceName = pieceName;
-        }
+        PieceType(final String pieceName) { this.pieceName = pieceName; }
 
         @Override
-        public String toString() {
-            return this.pieceName;
-        }
+        public String toString() { return this.pieceName; }
 
         public abstract boolean isKing();
     }

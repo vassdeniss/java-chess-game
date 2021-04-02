@@ -5,9 +5,15 @@ package com.chess.engine.player;
 public enum MoveStatus {
     DONE {
         @Override
-        boolean isDone() {
-            return true;
-        }
+        boolean isDone() { return true; }
+    },
+    ILLEGAL {
+        @Override
+        boolean isDone() { return false; }
+    },
+    CHECK {
+        @Override
+        boolean isDone() { return false; }
     };
 
     abstract boolean isDone();

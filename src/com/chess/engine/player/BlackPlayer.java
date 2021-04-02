@@ -14,18 +14,11 @@ public class BlackPlayer extends Player {
         super(board, standardBlackMoves, standardWhiteMoves);
     }
 
+    // Override and expose method fields
     @Override
-    public Collection<Piece> getActivePieces() {
-        return this.board.getBlackPieces();
-    }
-
+    public Collection<Piece> getActivePieces() { return this.board.getBlackPieces(); }
     @Override
-    public Alliance getAlliance() {
-        return Alliance.BLACK;
-    }
-
+    public Alliance getAlliance() { return Alliance.BLACK; }
     @Override
-    public Player getOpponent() {
-        return this.board.whitePlayer();
-    }
+    public Player getOpponent() { return this.board.whitePlayer(); }
 }

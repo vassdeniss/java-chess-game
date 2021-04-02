@@ -68,9 +68,7 @@ public class Queen extends Piece {
     }
 
     @Override
-    public String toString() {
-        return pieceType.QUEEN.toString();
-    }
+    public String toString() { return pieceType.QUEEN.toString(); }
 
     // Queen Exclusions
     private static boolean isFirstColumnExclusion(final int currentPosition, final int possibleOffset) {

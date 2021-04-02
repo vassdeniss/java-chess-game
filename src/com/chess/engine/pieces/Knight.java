@@ -70,9 +70,7 @@ public class Knight extends Piece {
     }
 
     @Override
-    public String toString() {
-        return pieceType.KNIGHT.toString();
-    }
+    public String toString() { return pieceType.KNIGHT.toString(); }
 
     // Knight Exclusions
     private static boolean isFirstColumnExclusion(final int currentPosition, final int possibleOffset) {

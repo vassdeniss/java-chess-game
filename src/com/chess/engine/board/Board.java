@@ -15,9 +15,10 @@ public class Board {
     // Collection of white || black pieces
     private final Collection<Piece> whitePieces;
     private final Collection<Piece> blackPieces;
-    // Method fields for both players
+    // Method fields for players
     private final WhitePlayer whitePlayer;
     private final BlackPlayer blackPlayer;
+    private final Player currentPlayer;
 
     // Board Constructor
     private Board(Builder builder) {
@@ -28,6 +29,7 @@ public class Board {
         final Collection<Move> standardBlackMoves = calculateLegalMoves(this.blackPieces);
         this.whitePlayer = new WhitePlayer(this, standardWhiteMoves, standardBlackMoves);
         this.blackPlayer = new BlackPlayer(this, standardWhiteMoves, standardBlackMoves);
+        this.currentPlayer = null; // STUB
     }
 
     @Override
@@ -53,23 +55,12 @@ public class Board {
         return sb.toString();
     }
 
-    public Player whitePlayer() {
-        return this.whitePlayer;
-    }
-
-    public Player blackPlayer() {
-        return this.blackPlayer;
-    }
-
-    // Returns the collection of black pieces
-    public Collection<Piece> getBlackPieces() {
-        return this.blackPieces;
-    }
-
-    // Returns the collection of white pieces
-    public Collection<Piece> getWhitePieces() {
-        return this.whitePieces;
-    }
+    // Exposing player fields and player pieces
+    public Player whitePlayer() { return this.whitePlayer; }
+    public Player blackPlayer() { return this.blackPlayer; }
+    public Player currentPlayer() { return this.currentPlayer; }
+    public Collection<Piece> getBlackPieces() { return this.blackPieces; }
+    public Collection<Piece> getWhitePieces() { return this.whitePieces; }
 
     // Method for making a list of all legal moves by looping through
     // the pieces and taking each ones moves and adding it to a list
@@ -105,9 +96,7 @@ public class Board {
     }
 
     // Get the tile on the specified int in the list of tiles (gameBoard)
-    public Tile getTile(final int tileCoordinate) {
-        return gameBoard.get(tileCoordinate);
-    }
+    public Tile getTile(final int tileCoordinate) { return gameBoard.get(tileCoordinate); }
 
     // Method for creating a game board
     private static List<Tile> createGameBoard(final Builder builder) {
@@ -179,9 +168,7 @@ public class Board {
         Alliance nextMoveDecider;
 
         // Constructor
-        public Builder() {
-            this.boardConfiguration = new HashMap<>();
-        }
+        public Builder() { this.boardConfiguration = new HashMap<>(); }
 
         // Method for setting the piece and the position of it
         // inside the board config list

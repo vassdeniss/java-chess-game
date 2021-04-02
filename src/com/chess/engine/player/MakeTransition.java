@@ -19,7 +19,5 @@ public class MakeTransition {
         this.moveStatus = moveStatus;
     }
 
-    public MoveStatus getMoveStatus() {
-        return this.moveStatus;
-    }
+    public MoveStatus getMoveStatus() { return this.moveStatus; }
 }

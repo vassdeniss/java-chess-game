@@ -107,7 +107,5 @@ public class Pawn extends Piece {
     }
 
     @Override
-    public String toString() {
-        return pieceType.PAWN.toString();
-    }
+    public String toString() { return pieceType.PAWN.toString(); }
 }
