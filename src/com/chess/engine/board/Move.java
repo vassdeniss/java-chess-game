@@ -2,6 +2,8 @@ package com.chess.engine.board;
 
 import com.chess.engine.pieces.Piece;
 
+import static com.chess.engine.board.Board.*;
+
 public abstract class Move {
     final Board board;
     final Piece movedPiece;
@@ -30,7 +32,29 @@ public abstract class Move {
 
         @Override
         public Board execute() {
-            return null;
+            final Builder builder = new Builder();
+
+            // Loop through the current player pieces
+            // if the current piece is not the moved piece
+            // just set it on the new board
+            for (final Piece piece : this.board.currentPlayer().getActivePieces()) {
+                // TODO hashcode / equals for pieces
+                if (this.movedPiece.equals(piece)) {
+                    builder.setPiece(piece);
+                }
+            }
+
+            // Loop through the opponent pieces and sets the pieces
+            // because the opponent doesn't have moved pieces
+            for (final Piece piece : this.board.currentPlayer().getOpponent().getActivePieces()) {
+                builder.setPiece(piece);
+            }
+
+            // TODO set the moved piece
+            builder.setPiece(null);
+            builder.setMoveDecider(this.board.currentPlayer().getOpponent().getAlliance());
+
+            return builder.build();
         }
     }
 
