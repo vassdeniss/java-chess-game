@@ -80,8 +80,7 @@ public class Board {
         final List<Piece> activePieces = new ArrayList<>();
         // For loop for going trough every single tile on the board
         // and if the tile is occupied
-        // take the piece and if that piece matches the
-        // color we gave it
+        // take the piece and if that piece matches the color we gave it
         // add it to the list and return an immutable copy
         for (final Tile tile : gameBoard) {
             if (tile.isTileOccupied()) {

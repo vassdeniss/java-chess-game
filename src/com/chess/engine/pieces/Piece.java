@@ -39,6 +39,8 @@ public abstract class Piece {
     // with legal moves for the specific piece
     public abstract Collection<Move> legalMoves(final Board board);
 
+    public abstract Piece movePiece(Move move);
+
     public enum PieceType {
         PAWN("P") {
             @Override

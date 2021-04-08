@@ -17,8 +17,9 @@ public abstract class Move {
         this.destinationCoordinates = destinationCoordinates;
     }
 
-    // Expose destination coordinates
+    // Expose method fields
     public int getDestinationCoordinate() { return this.destinationCoordinates; }
+    public Piece getMovedPiece() { return this.movedPiece; }
 
     public abstract Board execute();
 
@@ -49,9 +50,8 @@ public abstract class Move {
             for (final Piece piece : this.board.currentPlayer().getOpponent().getActivePieces()) {
                 builder.setPiece(piece);
             }
-
-            // TODO set the moved piece
-            builder.setPiece(null);
+            
+            builder.setPiece(this.movedPiece.movePiece(this));
             builder.setMoveDecider(this.board.currentPlayer().getOpponent().getAlliance());
 
             return builder.build();
