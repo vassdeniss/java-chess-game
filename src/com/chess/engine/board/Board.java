@@ -168,8 +168,8 @@ public class Board {
     public static class Builder {
         // Map containing the positions of each piece
         Map<Integer, Piece> boardConfiguration;
-        // Alliance variable for next player
         Alliance nextMoveDecider;
+        Pawn enPassantPawn;
 
         // Constructor
         public Builder() { this.boardConfiguration = new HashMap<>(); }
@@ -189,5 +189,9 @@ public class Board {
 
         // Return the built board
         public Board build() { return new Board(this); }
+
+        public void setEnPassantPawn(Pawn enPassantPawn) {
+            this.enPassantPawn = enPassantPawn;
+        }
     }
 }
