@@ -1,7 +1,6 @@
 package com.chess.engine.player;
 
 // Check if you can execute the move
-// STUB
 public enum MoveStatus {
     DONE {
         @Override
@@ -15,6 +14,5 @@ public enum MoveStatus {
         @Override
         boolean isDone() { return false; }
     };
-
     abstract boolean isDone();
 }

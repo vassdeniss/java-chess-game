@@ -7,17 +7,12 @@ import com.chess.engine.board.Move;
 import java.util.Collection;
 
 public abstract class Piece {
-    // Set method field for piece type
-    // Set int for the position of the piece on the board
-    // Set an "alliance" i.e the piece/player color
-    // Set boolean to check for first move
-    protected final PieceType pieceType;
-    protected final int piecePosition;
-    protected final Alliance pieceAlliance;
-    protected final boolean isFirstMove;
-    private final int cachedHashCode;
+    protected final PieceType pieceType; // Set method field for piece type
+    protected final int piecePosition; // Set int for the position of the piece on the board
+    protected final Alliance pieceAlliance; // Set an "alliance" i.e the piece/player color
+    protected final boolean isFirstMove; // Set boolean to check for first move
+    private final int cachedHashCode; // Set int for the hash code
 
-    // Constructor
     Piece(final PieceType pieceType, final int piecePosition, final Alliance pieceAlliance) {
         this.pieceType = pieceType;
         this.piecePosition = piecePosition;
@@ -37,16 +32,9 @@ public abstract class Piece {
 
     @Override
     public boolean equals(final Object other) {
-        if (this == other) {
-            return true;
-        }
-
-        if (!(other instanceof Piece)) {
-            return false;
-        }
-
+        if (this == other) { return true; }
+        if (!(other instanceof Piece)) { return false; }
         final Piece otherPiece = (Piece) other;
-
         return piecePosition == otherPiece.getPiecePosition()
                 && pieceType == otherPiece.getPieceType()
                 && pieceAlliance == otherPiece.getPieceAlliance()
@@ -54,20 +42,11 @@ public abstract class Piece {
     }
 
     @Override
-    public int hashCode() {
-        return this.cachedHashCode;
-    }
-
-    // Method for taking piece position
-    public int getPiecePosition() { return this.piecePosition; }
-
-    // Method for taking the pieces color
-    public Alliance getPieceAlliance() { return this.pieceAlliance; }
-
-    // Method for returning first move boolean
-    public boolean isFirstMove() { return this.isFirstMove; }
-
-    public PieceType getPieceType() { return this.pieceType; }
+    public int hashCode() { return this.cachedHashCode; }
+    public int getPiecePosition() { return this.piecePosition; } // Method that returns the piece position
+    public Alliance getPieceAlliance() { return this.pieceAlliance; } // Method that returns the pieces color
+    public boolean isFirstMove() { return this.isFirstMove; } // Method that returns true if its the first move
+    public PieceType getPieceType() { return this.pieceType; } // Method that returns the piece type
 
     // Abstract list each piece will inherit and each will be filled
     // with legal moves for the specific piece
@@ -79,26 +58,38 @@ public abstract class Piece {
         PAWN("P") {
             @Override
             public boolean isKing() { return false; }
+            @Override
+            public boolean isRook() { return false; }
         },
         KNIGHT("N") {
             @Override
             public boolean isKing() { return false; }
+            @Override
+            public boolean isRook() { return false; }
         },
         BISHOP("B") {
             @Override
             public boolean isKing() { return false; }
+            @Override
+            public boolean isRook() { return false; }
         },
         ROOK("R") {
             @Override
             public boolean isKing() { return false; }
+            @Override
+            public boolean isRook() { return true; }
         },
         QUEEN("Q") {
             @Override
             public boolean isKing() { return false; }
+            @Override
+            public boolean isRook() { return false; }
         },
         KING("k") {
             @Override
             public boolean isKing() { return true; }
+            @Override
+            public boolean isRook() { return false; }
         };
 
         private String pieceName;
@@ -109,5 +100,6 @@ public abstract class Piece {
         public String toString() { return this.pieceName; }
 
         public abstract boolean isKing();
+        public abstract boolean isRook();
     }
 }

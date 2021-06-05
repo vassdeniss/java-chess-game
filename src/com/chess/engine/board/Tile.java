@@ -8,7 +8,6 @@ import java.util.Map;
 
 public abstract class Tile {
     protected final int tileCoordinate;
-
     private static final Map<Integer, EmptyTile> EMPTY_TILES_CACHE = createAllEmptyTiles();
 
     // Method to set empty tiles on grid
@@ -33,22 +32,20 @@ public abstract class Tile {
     // Constructor for setting location
     private Tile(final int tileCoordinate) { this.tileCoordinate = tileCoordinate; }
 
-    // True or false depending if piece is on tile
+    // True or false depending if piece is on given tile.
     // Get the piece if its occupied
     public abstract boolean isTileOccupied();
     public abstract Piece getPiece();
+    public int getTileCoordinate() { return this.tileCoordinate; }
 
     public static final class EmptyTile extends Tile {
         private EmptyTile(int coordinate) { super(coordinate); }
-
         // Return a dash if the tile is empty
         @Override
         public String toString() { return "-"; }
-
         // Return false - no piece on empty tile
         @Override
         public boolean isTileOccupied() { return false; }
-
         // Return null - no piece on empty tile
         @Override
         public Piece getPiece() { return null; }

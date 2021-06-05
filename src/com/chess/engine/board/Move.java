@@ -2,8 +2,9 @@ package com.chess.engine.board;
 
 import com.chess.engine.pieces.Pawn;
 import com.chess.engine.pieces.Piece;
+import com.chess.engine.pieces.Rook;
 
-import static com.chess.engine.board.Board.*;
+import static com.chess.engine.board.Board.Builder;
 
 public abstract class Move {
     final Board board;
@@ -31,13 +32,8 @@ public abstract class Move {
 
     @Override
     public boolean equals(final Object other) {
-        if (this == other) {
-            return true;
-        }
-
-        if (!(other instanceof Move)) {
-            return false;
-        }
+        if (this == other) { return true; }
+        if (!(other instanceof Move)) { return false; }
 
         final Move otherMove = (Move) other;
 
@@ -62,7 +58,6 @@ public abstract class Move {
         // if the current piece is not the moved piece
         // just set it on the new board
         for (final Piece piece : this.board.currentPlayer().getActivePieces()) {
-            // TODO hashcode / equals for pieces
             if (this.movedPiece.equals(piece)) {
                 builder.setPiece(piece);
             }
@@ -89,7 +84,6 @@ public abstract class Move {
         }
     }
 
-    // TODO
     // Class for handling attacking
     public static class AttackMove extends Move {
         final Piece attackedPiece;
@@ -127,7 +121,6 @@ public abstract class Move {
         public Piece getAttackedPiece() { return this.attackedPiece; }
     }
 
-    // TODO
     // Class for moving the pawn
     public static final class PawnMove extends Move {
         public PawnMove(final Board board,
@@ -137,7 +130,6 @@ public abstract class Move {
         }
     }
 
-    // TODO
     // Class for handling an attack move with the pawn
     public static class PawnAttackMove extends AttackMove {
         public PawnAttackMove(final Board board,
@@ -148,7 +140,6 @@ public abstract class Move {
         }
     }
 
-    // TODO
     // Class for handling the "En Passant" rule/move
     public static final class PawnEnPassantAttackMove extends PawnAttackMove {
         public PawnEnPassantAttackMove(final Board board,
@@ -159,7 +150,6 @@ public abstract class Move {
         }
     }
 
-    // TODO
     // Class for handling the pawn jump
     public static final class PawnJump extends Move {
         public PawnJump(final Board board,
@@ -192,34 +182,80 @@ public abstract class Move {
         }
     }
 
-    // TODO
     // Class for handling castle moves
     static abstract class CastleMove extends Move {
+        protected final Rook castleRook;
+        protected final int castleRookPosition;
+        protected final int castleRookDestination;
+
         public CastleMove(final Board board,
                           final Piece movedPiece,
-                          final int destinationCoordinates) {
+                          final int destinationCoordinates,
+                          final Rook castleRook,
+                          final int castleRookPosition,
+                          final int castleRookDestination) {
             super(board, movedPiece, destinationCoordinates);
+            this.castleRook = castleRook;
+            this.castleRookPosition = castleRookPosition;
+            this.castleRookDestination = castleRookDestination;
+        }
+
+        public Rook getCastleRook() { return this.castleRook; }
+
+        @Override
+        public boolean isCastlingMove() { return true; }
+
+        @Override
+        public Board execute() {
+            final Builder builder = new Builder();
+
+            for (final Piece piece : this.board.currentPlayer().getActivePieces()) {
+                if (!this.movedPiece.equals(piece) && !this.castleRook.equals(piece)) {
+                    builder.setPiece(piece);
+                }
+            }
+
+            for (final Piece piece : this.board.currentPlayer().getOpponent().getActivePieces()) {
+                builder.setPiece(piece);
+            }
+
+            builder.setPiece(this.movedPiece.movePiece(this));
+            // TODO NO FIRST MOVE ARGUMENT ON NORMAL PIECES
+            builder.setPiece(new Rook(this.castleRookDestination, this.castleRook.getPieceAlliance()));
+            builder.setMoveDecider(this.board.currentPlayer().getOpponent().getAlliance());
+
+            return builder.build();
         }
     }
 
-    // TODO
-
+    // Class for handling castle moves with king
     public static final class KingSideCastleMove extends CastleMove {
         public KingSideCastleMove(final Board board,
                                   final Piece movedPiece,
-                                  final int destinationCoordinates) {
-            super(board, movedPiece, destinationCoordinates);
+                                  final int destinationCoordinates,
+                                  final Rook castleRook,
+                                  final int castleRookPosition,
+                                  final int castleRookDestination) {
+            super(board, movedPiece, destinationCoordinates, castleRook, castleRookPosition, castleRookDestination);
         }
+
+        @Override
+        public String toString() { return "O-O"; } // Portable Game Notation Standard
     }
 
-    // TODO
-
+    // Class for handling castle moves with queen
     public static final class QueenSideCastleMove extends CastleMove {
         public QueenSideCastleMove(final Board board,
                                    final Piece movedPiece,
-                                   final int destinationCoordinates) {
-            super(board, movedPiece, destinationCoordinates);
+                                   final int destinationCoordinates,
+                                   final Rook castleRook,
+                                   final int castleRookPosition,
+                                   final int castleRookDestination) {
+            super(board, movedPiece, destinationCoordinates, castleRook, castleRookPosition, castleRookDestination);
         }
+
+        @Override
+        public String toString() { return "O-O-O"; } // Portable Game Notation Standard
     }
 
     // Class for handling invalid moves
@@ -227,15 +263,11 @@ public abstract class Move {
         public InvalidMove() { super(null, null, -1); }
 
         @Override
-        public Board execute() {
-            throw new RuntimeException("Cannot execute an invalid move!");
-        }
+        public Board execute() { throw new RuntimeException("Cannot execute an invalid move!"); }
     }
 
     public static class MoveFactory {
-        private MoveFactory() {
-            throw new RuntimeException("Not Instantiable!");
-        }
+        private MoveFactory() { throw new RuntimeException("Not Instantiable!"); }
 
         public static Move createMove(final Board board,
                                       final int currentCoordinate,

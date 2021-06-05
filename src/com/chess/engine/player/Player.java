@@ -6,6 +6,7 @@ import com.chess.engine.board.Move;
 import com.chess.engine.pieces.King;
 import com.chess.engine.pieces.Piece;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,14 +23,12 @@ public abstract class Player {
            final Collection<Move> opponentMoves) {
         this.board = board;
         this.playerKing = establishKing();
-        this.legalMoves = legalMoves;
+        this.legalMoves = ImmutableList.copyOf(Iterables.concat(legalMoves, calculateKingCastles(legalMoves, opponentMoves)));
         this.isInCheck = !Player.calculateAttackOnTile(this.playerKing.getPiecePosition(), opponentMoves).isEmpty();
     }
 
-    // Expose player king
+    // Expose fields
     public King getPlayerKing() { return this.playerKing; }
-
-    // Expose own legal moves
     public Collection<Move> getLegalMoves() { return this.legalMoves; }
 
     // Method for calculating check
@@ -37,7 +36,7 @@ public abstract class Player {
     // If an enemy move overlaps the king's tile position
     // Add it to the attack moves list and return it
     // If the list is not empty the player is in check
-    private static Collection<Move> calculateAttackOnTile(int piecePosition, Collection<Move> moves) {
+    protected static Collection<Move> calculateAttackOnTile(int piecePosition, Collection<Move> moves) {
         final List<Move> attackMoves = new ArrayList<>();
 
         for (final Move move : moves) {
@@ -63,14 +62,10 @@ public abstract class Player {
 
     // Method for checking is a move is contained in
     // the collection of moves
-    // STUB
     public boolean isMoveLegal(final Move move) { return this.legalMoves.contains(move); }
 
-    // Method for checking if you're in check
-    public boolean isInCheck() { return this.isInCheck; }
-
-    // Method for checking if you're in checkmate
-    public boolean isInCheckMate() { return this.isInCheck && !hasEscapeMoves(); }
+    public boolean isInCheck() { return this.isInCheck; } // Method for checking if you're in check
+    public boolean isInCheckMate() { return this.isInCheck && !hasEscapeMoves(); } // Method for checking if you're in checkmate
 
     // Method for checking escape moves in case of checkmate
     // Loop through our possible moves
@@ -80,21 +75,13 @@ public abstract class Player {
     private boolean hasEscapeMoves() {
         for (final Move move : legalMoves) {
             final MakeTransition transition = makeMove(move);
-
-            if (transition.getMoveStatus().isDone()) {
-                return true;
-            }
+            if (transition.getMoveStatus().isDone()) { return true; }
         }
-
         return false;
     }
 
-    // Method for checking if you're in stalemate
-    public boolean isInStaleMate() { return !isInCheck && !hasEscapeMoves(); }
-
-    // Method for checking if you're castled
-    // STUB
-    public boolean isCastled() { return false; }
+    public boolean isInStaleMate() { return !isInCheck && !hasEscapeMoves(); } // Method for checking if you're in stalemate
+    public boolean isCastled() { return false; } // Method for checking if you're castled
 
     // Method for making the move
     // If the move is illegal return the same board
@@ -123,4 +110,5 @@ public abstract class Player {
     public abstract Collection<Piece> getActivePieces();
     public abstract Alliance getAlliance();
     public abstract Player getOpponent();
+    protected abstract Collection<Move> calculateKingCastles(Collection<Move> playerLegals, Collection<Move> opponentsLegals);
 }

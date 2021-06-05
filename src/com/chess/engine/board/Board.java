@@ -11,8 +11,7 @@ import com.google.common.collect.Iterables;
 import java.util.*;
 
 public class Board {
-    // List of tiles for the game board
-    private final List<Tile> gameBoard;
+    private final List<Tile> gameBoard; // List of tiles for the game board
     // Collection of white || black pieces
     private final Collection<Piece> whitePieces;
     private final Collection<Piece> blackPieces;
@@ -48,15 +47,13 @@ public class Board {
             // if i becomes 8 the modulus would be 0
             // i.e the row ended
             // add a new line
-            if ((i + 1) % BoardUtils.TILES_ROW == 0) {
-                sb.append("\n");
-            }
+            if ((i + 1) % BoardUtils.TILES_ROW == 0) { sb.append("\n"); }
         }
 
         return sb.toString();
     }
 
-    // Exposing player fields and player pieces
+    // Exposing fields
     public Player whitePlayer() { return this.whitePlayer; }
     public Player blackPlayer() { return this.blackPlayer; }
     public Player currentPlayer() { return this.currentPlayer; }
@@ -67,11 +64,7 @@ public class Board {
     // the pieces and taking each ones moves and adding it to a list
     private Collection<Move> calculateLegalMoves(final Collection<Piece> pieces) {
         final List<Move> legalMoves = new ArrayList<>();
-
-        for (Piece piece : pieces) {
-            legalMoves.addAll(piece.legalMoves(this));
-        }
-
+        for (Piece piece : pieces) { legalMoves.addAll(piece.legalMoves(this)); }
         return ImmutableList.copyOf(legalMoves);
     }
 
@@ -95,7 +88,7 @@ public class Board {
         return ImmutableList.copyOf(activePieces);
     }
 
-    // Get the tile on the specified int in the list of tiles (gameBoard)
+    // Get the tile on the specified int in the list of tiles
     public Tile getTile(final int tileCoordinate) { return gameBoard.get(tileCoordinate); }
 
     // Method for creating a game board
@@ -154,8 +147,7 @@ public class Board {
         builder.setPiece(new Knight(62, Alliance.WHITE));
         builder.setPiece(new Rook(63, Alliance.WHITE));
 
-        // White to move first
-        builder.setMoveDecider(Alliance.WHITE);
+        builder.setMoveDecider(Alliance.WHITE); // White to move first
 
         return builder.build();
     }
@@ -166,13 +158,11 @@ public class Board {
 
     // Builder Class
     public static class Builder {
-        // Map containing the positions of each piece
-        Map<Integer, Piece> boardConfiguration;
+        Map<Integer, Piece> boardConfiguration; // Map containing the positions of each piece
         Alliance nextMoveDecider;
         Pawn enPassantPawn;
 
-        // Constructor
-        public Builder() { this.boardConfiguration = new HashMap<>(); }
+        public Builder() { this.boardConfiguration = new HashMap<>(); } // Constructor
 
         // Method for setting the piece and the position of it
         // inside the board config list
@@ -187,11 +177,7 @@ public class Board {
             return this;
         }
 
-        // Return the built board
-        public Board build() { return new Board(this); }
-
-        public void setEnPassantPawn(Pawn enPassantPawn) {
-            this.enPassantPawn = enPassantPawn;
-        }
+        public Board build() { return new Board(this); } // Return the built board
+        public void setEnPassantPawn(Pawn enPassantPawn) { this.enPassantPawn = enPassantPawn; }
     }
 }

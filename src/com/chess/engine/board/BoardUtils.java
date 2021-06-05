@@ -46,6 +46,6 @@ public class BoardUtils {
     // Throw a runtime exception on instance of class
     private BoardUtils() { throw new RuntimeException("You cannot instance me!"); }
 
-    // Method for validating coordiantes
+    // Method for validating coordinates
     public static boolean isValidTileCoordinate(final int coordinates) { return coordinates >= 0 && coordinates < TILES; }
 }
