@@ -43,8 +43,8 @@ public class Pawn extends Piece {
             // Then determine wheres the pawn i.e if its black and on second row or
             // white on seventh row
             } else if (currentPossibleMove == 16 && this.isFirstMove() &&
-                    (BoardUtils.SECOND_ROW[this.piecePosition] && this.pieceAlliance.isBlack())
-                    || (BoardUtils.SEVENTH_ROW[this.piecePosition] && this.pieceAlliance.isWhite())) {
+                    (BoardUtils.SEVENTH_RANK[this.piecePosition] && this.pieceAlliance.isBlack())
+                    || (BoardUtils.SECOND_RANK[this.piecePosition] && this.pieceAlliance.isWhite())) {
                 // get for the tile behind the jumped tile
                 final int behindPossibleDestinationCoordinate = this.piecePosition +
                         (this.pieceAlliance.getDirection() * 8
