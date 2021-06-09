@@ -69,17 +69,16 @@ public class Board {
     }
 
     // Method for taking the pieces on the board
-    private static Collection<Piece> calculateActivePieces(final List<Tile> gameBoard, final Alliance alliance) {
+    private static Collection<Piece> calculateActivePieces(final List<Tile> gameBoard, final Alliance pieceAlliance) {
         // List of active pieces
         final List<Piece> activePieces = new ArrayList<>();
-        // For loop for going trough every single tile on the board
-        // and if the tile is occupied
+        // For loop for going trough every single tile on the board and if the tile is occupied
         // take the piece and if that piece matches the color we gave it
         // add it to the list and return an immutable copy
         for (final Tile tile : gameBoard) {
             if (tile.isTileOccupied()) {
                 final Piece piece = tile.getPiece();
-                if (piece.getPieceAlliance() == alliance) {
+                if (piece.getPieceAlliance() == pieceAlliance) {
                     activePieces.add(piece);
                 }
             }

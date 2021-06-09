@@ -27,7 +27,7 @@ public class Pawn extends Piece {
             final int possibleDestinationCoordinate = this.piecePosition + (this.pieceAlliance.getDirection() * currentPossibleMove);
 
             // if the tile is valid continue
-            if (BoardUtils.isValidTileCoordinate(possibleDestinationCoordinate)) {
+            if (!BoardUtils.isValidTileCoordinate(possibleDestinationCoordinate)) {
                 continue;
             }
 
@@ -76,7 +76,7 @@ public class Pawn extends Piece {
                                 board,
                                 this,
                                 possibleDestinationCoordinate,
-                                pieceAtTile) /*placeholder*/
+                                pieceAtTile)
                         );
                     }
                 }
@@ -96,7 +96,7 @@ public class Pawn extends Piece {
                                 board,
                                 this,
                                 possibleDestinationCoordinate,
-                                pieceAtTile) /*placeholder*/
+                                pieceAtTile)
                         );
                     }
                 }

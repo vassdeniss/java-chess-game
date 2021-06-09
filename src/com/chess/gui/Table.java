@@ -5,6 +5,7 @@ import com.chess.engine.board.BoardUtils;
 import com.chess.engine.board.Move;
 import com.chess.engine.board.Tile;
 import com.chess.engine.pieces.Piece;
+import com.chess.engine.player.MakeTransition;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -19,13 +20,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.chess.engine.board.Move.*;
 import static javax.swing.SwingUtilities.isLeftMouseButton;
 import static javax.swing.SwingUtilities.isRightMouseButton;
 
 public class Table {
     private final JFrame gameFrame;
     private final BoardPanel boardPanel;
-    private final Board chessBoard;
+    private Board chessBoard;
 
     private Tile sourceTile;
     private Tile destinationTile;
@@ -102,6 +104,17 @@ public class Table {
             setPreferredSize(BOARD_PANEL_DIMENSION);
             validate();
         }
+
+        // Method to refresh GUI
+        public void drawBoard(final Board board) {
+            removeAll();
+            for (final TilePanel tilePanel : boardTiles) {
+                tilePanel.drawTile(board);
+                add(tilePanel);
+            }
+            validate();
+            repaint();
+        }
     }
 
     private class TilePanel extends JPanel {
@@ -116,22 +129,40 @@ public class Table {
             addMouseListener(new MouseListener() {
                 @Override
                 public void mouseClicked(final MouseEvent e) {
+                    // Right button cancels choice
                     if (isRightMouseButton(e)) {
                         sourceTile = null;
                         destinationTile = null;
                         humanMovedPiece = null;
+                    // Left button selects a piece
                     } else if (isLeftMouseButton(e)) {
+                        // Selecting the tile if there is a piece on it
                         if (sourceTile == null) {
                             sourceTile = chessBoard.getTile(tileId);
                             humanMovedPiece = sourceTile.getPiece();
                             if (humanMovedPiece == null) {
                                 sourceTile = null;
                             }
+                        // Executing move on second tile selection i.e destination
                         } else {
-                            // TODO
                             destinationTile = chessBoard.getTile(tileId);
-                            final Move move = null;
+                            final Move move = MoveFactory.createMove(chessBoard, sourceTile.getTileCoordinate(),
+                                                                          destinationTile.getTileCoordinate());
+                            final MakeTransition transition = chessBoard.currentPlayer().makeMove(move);
+                            if (transition.getMoveStatus().isDone()) {
+                                chessBoard = transition.getTransitionBoard();
+                                // TODO Add move to the move log
+                            }
+                            sourceTile = null;
+                            destinationTile = null;
+                            humanMovedPiece = null;
                         }
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                boardPanel.drawBoard(chessBoard);
+                            }
+                        });
                     }
                 }
 
@@ -158,6 +189,15 @@ public class Table {
             validate();
         }
 
+        // Draw the tiles on the board
+        public void drawTile(final Board board) {
+            assignTileColor();
+            assignTilePieceIcon(board);
+            validate();
+            repaint();
+        }
+
+        // Assign icons to the pieces
         private void assignTilePieceIcon(final Board board) {
             this.removeAll();
             if (board.getTile(this.tileId).isTileOccupied()) {
