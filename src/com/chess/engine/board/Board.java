@@ -64,7 +64,9 @@ public class Board {
     // the pieces and taking each ones moves and adding it to a list
     private Collection<Move> calculateLegalMoves(final Collection<Piece> pieces) {
         final List<Move> legalMoves = new ArrayList<>();
-        for (Piece piece : pieces) { legalMoves.addAll(piece.legalMoves(this)); }
+        for (Piece piece : pieces) {
+            legalMoves.addAll(piece.legalMoves(this));
+        }
         return ImmutableList.copyOf(legalMoves);
     }
 
