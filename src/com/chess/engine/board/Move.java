@@ -100,7 +100,7 @@ public abstract class Move {
 
         @Override
         public String toString() {
-            return movedPiece.getPieceType().toString() + BoardUtils.getPositionAtCoordinate(this.destinationCoordinates);
+            return movedPiece.getPieceType().toString() + BoardUtils.getPostionAtCoordinate(this.destinationCoordinates);
         }
     }
 
@@ -200,6 +200,11 @@ public abstract class Move {
             builder.setMoveDecider(this.board.currentPlayer().getOpponent().getAlliance());
             return builder.build();
         }
+
+        @Override
+        public String toString() {
+            return BoardUtils.getPostionAtCoordinate(this.destinationCoordinates);
+        }
     }
 
     // Class for handling castle moves
@@ -240,7 +245,6 @@ public abstract class Move {
             }
 
             builder.setPiece(this.movedPiece.movePiece(this));
-            // TODO NO FIRST MOVE ARGUMENT ON NORMAL PIECES
             builder.setPiece(new Rook(this.castleRookDestination, this.castleRook.getPieceAlliance()));
             builder.setMoveDecider(this.board.currentPlayer().getOpponent().getAlliance());
 
@@ -280,7 +284,7 @@ public abstract class Move {
 
     // Class for handling invalid moves
     public static final class InvalidMove extends Move {
-        public InvalidMove() { super(null, null, -1); }
+        public InvalidMove() { super(null, -1); }
 
         @Override
         public Board execute() { throw new RuntimeException("Cannot execute an invalid move!"); }

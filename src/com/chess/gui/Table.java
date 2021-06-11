@@ -29,7 +29,11 @@ import static javax.swing.SwingUtilities.isRightMouseButton;
 
 public class Table {
     private final JFrame gameFrame;
+    private final GameHistoryPanel gameHistoryPanel;
+    private final TakenPiecesPanel takenPiecesPanel;
+    private final Test test;
     private final BoardPanel boardPanel;
+    private final MoveLog moveLog;
     private Board chessBoard;
 
     private Tile sourceTile;
@@ -56,10 +60,16 @@ public class Table {
         this.gameFrame.setJMenuBar(tableMenuBar);
         this.gameFrame.setSize(OUTER_FRAME_DIMENSION);
         this.chessBoard = Board.createStandardBoard();
+        this.gameHistoryPanel = new GameHistoryPanel();
+        this.takenPiecesPanel = new TakenPiecesPanel();
+        this.test = new Test();
         this.boardPanel = new BoardPanel();
+        this.moveLog = new MoveLog();
         this.boardDirection = BoardDirection.NORMAL;
         this.highlightMoves = false;
+        //this.gameFrame.add(this.takenPiecesPanel, BorderLayout.WEST);
         this.gameFrame.add(this.boardPanel, BorderLayout.CENTER);
+        //this.gameFrame.add(this.gameHistoryPanel, BorderLayout.EAST);
         this.gameFrame.setVisible(true);
     }
 
@@ -67,6 +77,7 @@ public class Table {
         final JMenuBar tableMenuBar = new JMenuBar();
         tableMenuBar.add(createFileMenu());
         tableMenuBar.add(createPreferencesMenu());
+        tableMenuBar.add(createDevMenu());
         return tableMenuBar;
     }
 
@@ -78,18 +89,14 @@ public class Table {
         // Open PGN Option
         openPGN.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("You pressed on the load pgn button");
-            }
+            public void actionPerformed(ActionEvent e) { System.out.println("You pressed on the load pgn button"); }
         });
         fileMenu.add(openPGN);
 
         // Exit Game Option
         exitGame.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                System.exit(0);
-            }
+            public void actionPerformed(ActionEvent e) { System.exit(0); }
         });
         fileMenu.add(exitGame);
 
@@ -116,13 +123,30 @@ public class Table {
         // Highlight Moves Option
         legalMovesHighligher.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                highlightMoves = legalMovesHighligher.isSelected();
-            }
+            public void actionPerformed(ActionEvent e) { highlightMoves = legalMovesHighligher.isSelected(); }
         });
         preferencesMenu.add(legalMovesHighligher);
 
         return preferencesMenu;
+    }
+
+    private JMenu createDevMenu() {
+        final JMenu devMenu = new JMenu("Dev");
+        final JCheckBoxMenuItem openHistory = new JCheckBoxMenuItem("Move History Panel", true);
+
+        openHistory.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!openHistory.isSelected()) {
+                    gameHistoryPanel.setVisible(false);
+                } else if (openHistory.isSelected()) {
+                    gameHistoryPanel.setVisible(true);
+                }
+            }
+        });
+        devMenu.add(openHistory);
+
+        return devMenu;
     }
 
     public enum BoardDirection {
@@ -171,6 +195,17 @@ public class Table {
         }
     }
 
+    public static class MoveLog {
+        private final List<Move> moves;
+        MoveLog() { this.moves = new ArrayList<>(); }
+        public List<Move> getMoves() { return this.moves; }
+        public void addMove(final Move move) { this.moves.add(move); }
+        public int size() { return this.moves.size(); }
+        public void clear() { this.moves.clear(); }
+        public boolean removeMove(final Move move) { return this.moves.remove(move); }
+        public Move removeMove(int index) { return this.moves.remove(index); }
+    }
+
     private class TilePanel extends JPanel {
         private final int tileId;
 
@@ -205,7 +240,7 @@ public class Table {
                             final MakeTransition transition = chessBoard.currentPlayer().makeMove(move);
                             if (transition.getMoveStatus().isDone()) {
                                 chessBoard = transition.getTransitionBoard();
-                                // TODO Add move to the move log
+                                moveLog.addMove(move);
                             }
                             sourceTile = null;
                             destinationTile = null;
@@ -214,6 +249,9 @@ public class Table {
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override
                             public void run() {
+                                gameHistoryPanel.redo(chessBoard, moveLog);
+                                takenPiecesPanel.redo(moveLog);
+                                test.redo(moveLog);
                                 boardPanel.drawBoard(chessBoard);
                             }
                         });
