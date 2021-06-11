@@ -10,11 +10,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static com.chess.engine.board.Move.*;
+
 public class Pawn extends Piece {
     private final static int[] POSSIBLE_MOVE_COORDINATES = {7, 8, 9, 16};
 
     public Pawn(final int piecePosition, final Alliance pieceAlliance) {
-        super(PieceType.PAWN, piecePosition, pieceAlliance);
+        super(PieceType.PAWN, piecePosition, pieceAlliance, true);
+    }
+
+    public Pawn(final int piecePosition, final Alliance pieceAlliance, final boolean isFirstMove) {
+        super(PieceType.PAWN, piecePosition, pieceAlliance, isFirstMove);
     }
 
     @Override
@@ -25,31 +31,26 @@ public class Pawn extends Piece {
         // Note*: 8 is normal move, 16 is jump, 7 and 9 are diagonal attack moves
         for (final int currentPossibleMove : POSSIBLE_MOVE_COORDINATES) {
             final int possibleDestinationCoordinate = this.piecePosition + (this.pieceAlliance.getDirection() * currentPossibleMove);
-
             // if the tile is valid continue
-            if (!BoardUtils.isValidTileCoordinate(possibleDestinationCoordinate)) {
-                continue;
-            }
-
+            if (!BoardUtils.isValidTileCoordinate(possibleDestinationCoordinate)) { continue; }
             // if the move is 8 (normal) and the tile is not occupied
             // add a normal move
             if (currentPossibleMove == 8 && !board.getTile(possibleDestinationCoordinate).isTileOccupied()) {
-                legalMoves.add(new Move.NormalMove(board, this, possibleDestinationCoordinate));
+                legalMoves.add(new NormalMove(board, this, possibleDestinationCoordinate));
             // Determine the move is 16 (jump) (only executable on first move)
             // Then determine wheres the pawn i.e if its black and on second row or
             // white on seventh row
             } else if (currentPossibleMove == 16 && this.isFirstMove() &&
-                    (BoardUtils.SEVENTH_RANK[this.piecePosition] && this.pieceAlliance.isBlack())
-                    || (BoardUtils.SECOND_RANK[this.piecePosition] && this.pieceAlliance.isWhite())) {
+                    ((BoardUtils.SEVENTH_RANK[this.piecePosition] && this.pieceAlliance.isBlack())
+                    || (BoardUtils.SECOND_RANK[this.piecePosition] && this.pieceAlliance.isWhite()))) {
                 // get for the tile behind the jumped tile
-                final int behindPossibleDestinationCoordinate = this.piecePosition +
-                        (this.pieceAlliance.getDirection() * 8);
-
+                final int behindPossibleDestinationCoordinate = this.piecePosition
+                        + (this.pieceAlliance.getDirection() * 8);
                 // if the behind tile is not occupied and the jump tile is not occupied
                 // add a jump move
                 if (!board.getTile(behindPossibleDestinationCoordinate).isTileOccupied()
                     && !board.getTile(possibleDestinationCoordinate).isTileOccupied()) {
-                    legalMoves.add(new Move.PawnJump(board, this, possibleDestinationCoordinate));
+                    legalMoves.add(new PawnJump(board, this, possibleDestinationCoordinate));
                 }
             // If the attack is 7 (diagonal attack right)
             // and if the piece is white and not on the eight column (impossible diagonal attack)
@@ -61,9 +62,8 @@ public class Pawn extends Piece {
                 // if the tile is occupied add an attack move
                 if (board.getTile(possibleDestinationCoordinate).isTileOccupied()) {
                     final Piece pieceAtTile = board.getTile(possibleDestinationCoordinate).getPiece();
-
                     if (this.pieceAlliance != pieceAtTile.getPieceAlliance()) {
-                        legalMoves.add(new Move.AttackMove(
+                        legalMoves.add(new PawnAttackMove(
                                 board,
                                 this,
                                 possibleDestinationCoordinate,
@@ -81,9 +81,8 @@ public class Pawn extends Piece {
                 // if the tile is occupied add an attack move
                 if (board.getTile(possibleDestinationCoordinate).isTileOccupied()) {
                     final Piece pieceAtTile = board.getTile(possibleDestinationCoordinate).getPiece();
-
                     if (this.pieceAlliance != pieceAtTile.getPieceAlliance()) {
-                        legalMoves.add(new Move.AttackMove(
+                        legalMoves.add(new PawnAttackMove(
                                 board,
                                 this,
                                 possibleDestinationCoordinate,
@@ -93,7 +92,6 @@ public class Pawn extends Piece {
                 }
             }
         }
-
         return ImmutableList.copyOf(legalMoves);
     }
 
