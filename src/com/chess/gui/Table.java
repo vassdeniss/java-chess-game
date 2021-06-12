@@ -45,6 +45,10 @@ public class Table {
     // Tile colors
     private final Color lightTileColor = Color.decode("#FFFACD");
     private final Color darkTileColor = Color.decode("#593E1A");
+    private final Color whiteTileColor = Color.WHITE;
+    private final Color blackTileColor = Color.BLACK;
+    private Color chosenColorOne = lightTileColor;
+    private Color chosenColorTwo = darkTileColor;
 
     private static String defaultPieceImagePath = "src/com/chess/art/pieces/";
 
@@ -59,6 +63,7 @@ public class Table {
         final JMenuBar tableMenuBar = createMenuBar();
         this.gameFrame.setJMenuBar(tableMenuBar);
         this.gameFrame.setSize(OUTER_FRAME_DIMENSION);
+        this.gameFrame.setResizable(false);
         this.chessBoard = Board.createStandardBoard();
         this.gameHistoryPanel = new GameHistoryPanel();
         this.takenPiecesPanel = new TakenPiecesPanel();
@@ -117,7 +122,7 @@ public class Table {
             @Override
             public void actionPerformed(ActionEvent e) {
                 boardDirection = boardDirection.opposite();
-                boardPanel.drawBoard(chessBoard);
+                boardPanel.drawBoard(chessBoard, chosenColorOne, chosenColorTwo);
             }
         });
         preferencesMenu.add(flipBoard);
@@ -138,6 +143,9 @@ public class Table {
         final JMenu devMenu = new JMenu("Dev");
         final JCheckBoxMenuItem openHistory = new JCheckBoxMenuItem("Move History Panel", true);
         final JCheckBoxMenuItem openTaken = new JCheckBoxMenuItem("Taken Pieces Panel", true);
+        final JMenuItem normalTheme = new JMenuItem("Default Theme");
+        final JMenuItem blackWhite = new JMenuItem("Black & White Theme");
+        final JMenuItem customTheme = new JMenuItem("Custom Theme");
 
         openHistory.addActionListener(new ActionListener() {
             @Override
@@ -162,6 +170,55 @@ public class Table {
             }
         });
         devMenu.add(openTaken);
+
+        devMenu.addSeparator();
+
+        normalTheme.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                chosenColorOne = lightTileColor;
+                chosenColorTwo = darkTileColor;
+                boardPanel.drawBoard(chessBoard, chosenColorOne, chosenColorTwo);
+            }
+        });
+        devMenu.add(normalTheme);
+
+        blackWhite.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                chosenColorOne = whiteTileColor;
+                chosenColorTwo = blackTileColor;
+                boardPanel.drawBoard(chessBoard, chosenColorOne, chosenColorTwo);
+            }
+        });
+        devMenu.add(blackWhite);
+
+        devMenu.addSeparator();
+
+        customTheme.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String colorOne = JOptionPane.showInputDialog(gameFrame, "Please input hex code for the light color: ", "Light color", JOptionPane.QUESTION_MESSAGE);
+                if (colorOne != null && !colorOne.equals("")) {
+                    if (colorOne.charAt(0) == '#' && colorOne.length() == 7) {
+                        String colorTwo = JOptionPane.showInputDialog(gameFrame, "Please input hex code for the dark color: ", "Dark color", JOptionPane.QUESTION_MESSAGE);
+                        if (colorTwo != null && !colorTwo.equals("")) {
+                            if (colorTwo.charAt(0) == '#' && colorTwo.length() == 7) {
+                                chosenColorOne = Color.decode(colorOne);
+                                chosenColorTwo = Color.decode(colorTwo);
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Not a valid color hex!", "Error", JOptionPane.WARNING_MESSAGE);
+                            }
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Not a valid color hex!", "Error", JOptionPane.WARNING_MESSAGE);
+                    }
+                }
+
+                boardPanel.drawBoard(chessBoard, chosenColorOne, chosenColorTwo);
+            }
+        });
+        devMenu.add(customTheme);
 
         return devMenu;
     }
@@ -201,10 +258,10 @@ public class Table {
         }
 
         // Method to refresh GUI
-        public void drawBoard(final Board board) {
+        public void drawBoard(final Board board, final Color light, final Color dark) {
             removeAll();
             for (final TilePanel tilePanel : boardDirection.traverse(boardTiles)) {
-                tilePanel.drawTile(board);
+                tilePanel.drawTile(board, light, dark);
                 add(tilePanel);
             }
             validate();
@@ -230,7 +287,7 @@ public class Table {
             super(new GridBagLayout());
             this.tileId = tileId;
             setPreferredSize(TILE_PANEL_DIMENSION);
-            assignTileColor();
+            assignTileColor(chosenColorOne, chosenColorTwo);
             assignTilePieceIcon(chessBoard);
             addMouseListener(new MouseListener() {
                 @Override
@@ -268,7 +325,7 @@ public class Table {
                             public void run() {
                                 gameHistoryPanel.redo(chessBoard, moveLog);
                                 takenPiecesPanel.redo(moveLog);
-                                boardPanel.drawBoard(chessBoard);
+                                boardPanel.drawBoard(chessBoard, chosenColorOne, chosenColorTwo);
                             }
                         });
                     }
@@ -319,8 +376,8 @@ public class Table {
         }
 
         // Draw the tiles on the board
-        public void drawTile(final Board board) {
-            assignTileColor();
+        public void drawTile(final Board board, final Color light, final Color dark) {
+            assignTileColor(light, dark);
             assignTilePieceIcon(board);
             highlightLegals(board);
             validate();
@@ -343,7 +400,7 @@ public class Table {
         }
 
         // Assign colors based on tile oddness or evenness
-        private void assignTileColor() {
+        public void assignTileColor(final Color lightTileColor, final Color darkTileColor) {
             if (BoardUtils.EIGHTH_RANK[this.tileId] ||
                     BoardUtils.SIXTH_RANK[this.tileId] ||
                     BoardUtils.FOURTH_RANK[this.tileId] ||
