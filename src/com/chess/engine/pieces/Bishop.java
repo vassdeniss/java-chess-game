@@ -51,22 +51,14 @@ public class Bishop extends Piece {
                     final Tile possibleDestinationTile = board.getTile(possibleDestinationCoordinates);
 
                     if (!possibleDestinationTile.isTileOccupied()) {
-                        legalMoves.add(new NormalMove(
-                                board,
-                                this,
-                                possibleDestinationCoordinates)
-                        );
+                        legalMoves.add(new NormalMove(board, this, possibleDestinationCoordinates));
                     } else {
                         final Piece pieceAtDestination = possibleDestinationTile.getPiece();
                         final Alliance pieceAlliance = pieceAtDestination.getPieceAlliance();
 
                         if (pieceAlliance != this.pieceAlliance) {
-                            legalMoves.add(new AttackMove(
-                                    board,
-                                    this,
-                                    possibleDestinationCoordinates,
-                                    pieceAtDestination)
-                            );
+                            legalMoves.add(new MajorAttackMove(board, this,
+                                    possibleDestinationCoordinates, pieceAtDestination));
                         }
 
                         break;

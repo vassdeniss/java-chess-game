@@ -7,18 +7,18 @@ import com.chess.engine.pieces.Rook;
 import static com.chess.engine.board.Board.Builder;
 
 public abstract class Move {
-    protected Board board;
-    protected Piece movedPiece;
-    protected int destinationCoordinates;
+    protected final Board board;
+    protected final Piece movedPiece;
+    protected final int destinationCoordinates;
     protected final boolean isFirstMove;
 
     public static final Move NULL_MOVE = new InvalidMove();
 
     private Move(final Board board,
-                 final Piece movedPiece,
+                 final Piece pieceMoved,
                  final int destinationCoordinates) {
         this.board = board;
-        this.movedPiece = movedPiece;
+        this.movedPiece = pieceMoved;
         this.destinationCoordinates = destinationCoordinates;
         this.isFirstMove = movedPiece.isFirstMove();
     }
@@ -26,8 +26,8 @@ public abstract class Move {
     private Move(final Board board,
                  final int destinationCoordinates) {
         this.board = board;
-        this.movedPiece = null;
         this.destinationCoordinates = destinationCoordinates;
+        this.movedPiece = null;
         this.isFirstMove = false;
     }
 
@@ -38,6 +38,7 @@ public abstract class Move {
         result = prime * result + this.destinationCoordinates;
         result = prime * result + this.movedPiece.hashCode();
         result = prime * result + this.movedPiece.getPiecePosition();
+        result = result + (isFirstMove ? 1 : 0);
         return result;
     }
 
@@ -68,7 +69,7 @@ public abstract class Move {
         // if the current piece is not the moved piece
         // just set it on the new board
         for (final Piece piece : this.board.currentPlayer().getActivePieces()) {
-            if (this.movedPiece.equals(piece)) {
+            if (!this.movedPiece.equals(piece)) {
                 builder.setPiece(piece);
             }
         }
@@ -81,8 +82,25 @@ public abstract class Move {
 
         builder.setPiece(this.movedPiece.movePiece(this));
         builder.setMoveDecider(this.board.currentPlayer().getOpponent().getAlliance());
-
         return builder.build();
+    }
+
+    // Class for handling attacks
+    public static class MajorAttackMove extends AttackMove {
+        public MajorAttackMove(final Board board, final Piece movedPiece,
+                               final int destination, final Piece attackedPiece) {
+            super(board, movedPiece, destination, attackedPiece);
+        }
+
+        @Override
+        public boolean equals(final Object other) {
+            return this == other || other instanceof MajorAttackMove && super.equals(other);
+        }
+
+        @Override
+        public String toString() {
+            return movedPiece.getPieceType() + BoardUtils.getPostionAtCoordinate(this.destinationCoordinates);
+        }
     }
 
     // Class for handling legal moves
@@ -104,16 +122,16 @@ public abstract class Move {
         }
     }
 
-    // Class for handling attacking
+    // Class for handling attacks (middleman)
     public static class AttackMove extends Move {
-        final Piece attackedPiece;
+        private final Piece attackedPiece;
 
         public AttackMove(final Board board,
                           final Piece movedPiece,
                           final int destinationCoordinates,
-                          final Piece attackedPiece) {
+                          final Piece pieceAttacked) {
             super(board, movedPiece, destinationCoordinates);
-            this.attackedPiece = attackedPiece;
+            this.attackedPiece = pieceAttacked;
         }
 
         @Override
@@ -122,17 +140,11 @@ public abstract class Move {
         @Override
         public boolean equals(final Object other) {
             if (this == other) { return true; }
-
             if (!(other instanceof AttackMove)) { return false; }
-
             final AttackMove otherAttackMove = (AttackMove) other;
-
             return super.equals(otherAttackMove)
                     && getAttackedPiece().equals(otherAttackMove.getAttackedPiece());
         }
-
-        @Override
-        public Board execute() { return null; }
 
         @Override
         public boolean isAttack() { return true; }
@@ -148,6 +160,14 @@ public abstract class Move {
                         final int destinationCoordinates) {
             super(board, movedPiece, destinationCoordinates);
         }
+
+        @Override
+        public boolean equals(final Object other) {
+            return this == other || other instanceof PawnMove && super.equals(other);
+        }
+
+        @Override
+        public String toString() { return BoardUtils.getPostionAtCoordinate(this.destinationCoordinates); }
     }
 
     // Class for handling an attack move with the pawn
@@ -158,6 +178,18 @@ public abstract class Move {
                               final Piece attackedPiece) {
             super(board, movedPiece, destinationCoordinates, attackedPiece);
         }
+
+        @Override
+        public boolean equals(final Object other) {
+            return this == other || other instanceof PawnAttackMove && super.equals(other);
+        }
+
+        // PGN format
+        @Override
+        public String toString() {
+            return BoardUtils.getPostionAtCoordinate(this.movedPiece.getPiecePosition()).substring(0, 1) + "x" +
+                    BoardUtils.getPostionAtCoordinate(this.destinationCoordinates);
+        }
     }
 
     // Class for handling the "En Passant" rule/move
@@ -167,6 +199,30 @@ public abstract class Move {
                                        final int destinationCoordinates,
                                        final Piece attackedPiece) {
             super(board, movedPiece, destinationCoordinates, attackedPiece);
+        }
+
+        @Override
+        public boolean equals(final Object other) {
+            return this == other || other instanceof PawnEnPassantAttackMove && super.equals(other);
+        }
+
+        @Override
+        public Board execute() {
+            final Builder builder = new Builder();
+            for (final Piece piece : this.board.currentPlayer().getActivePieces()) {
+                if (!this.movedPiece.equals(piece)) {
+                    builder.setPiece(piece);
+                }
+            }
+
+            for (final Piece piece : this.board.currentPlayer().getOpponent().getActivePieces()) {
+                if (!piece.equals(this.getAttackedPiece())) {
+                    builder.setPiece(piece);
+                }
+            }
+            builder.setPiece(this.movedPiece.movePiece(this));
+            builder.setMoveDecider(this.board.currentPlayer().getOpponent().getAlliance());
+            return builder.build();
         }
     }
 
@@ -202,9 +258,7 @@ public abstract class Move {
         }
 
         @Override
-        public String toString() {
-            return BoardUtils.getPostionAtCoordinate(this.destinationCoordinates);
-        }
+        public String toString() { return BoardUtils.getPostionAtCoordinate(this.destinationCoordinates); }
     }
 
     // Class for handling castle moves
@@ -245,10 +299,27 @@ public abstract class Move {
             }
 
             builder.setPiece(this.movedPiece.movePiece(this));
-            builder.setPiece(new Rook(this.castleRookDestination, this.castleRook.getPieceAlliance()));
+            builder.setPiece(new Rook(this.castleRookDestination, this.castleRook.getPieceAlliance(), false));
             builder.setMoveDecider(this.board.currentPlayer().getOpponent().getAlliance());
 
             return builder.build();
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = super.hashCode();
+            result = prime * result + this.castleRook.hashCode();
+            result = prime * result + this.castleRookDestination;
+            return result;
+        }
+
+        @Override
+        public boolean equals(final Object other) {
+            if (this == other) { return true; }
+            if (!(other instanceof CastleMove)) { return false; }
+            final CastleMove otherCastleMove = (CastleMove) other;
+            return super.equals(otherCastleMove) && this.castleRook.equals(otherCastleMove.getCastleRook());
         }
     }
 
@@ -261,6 +332,11 @@ public abstract class Move {
                                   final int castleRookPosition,
                                   final int castleRookDestination) {
             super(board, movedPiece, destinationCoordinates, castleRook, castleRookPosition, castleRookDestination);
+        }
+
+        @Override
+        public boolean equals(final Object other) {
+            return this == other || other instanceof KingSideCastleMove && super.equals(other);
         }
 
         @Override
@@ -279,15 +355,23 @@ public abstract class Move {
         }
 
         @Override
+        public boolean equals(final Object other) {
+            return this == other || other instanceof QueenSideCastleMove && super.equals(other);
+        }
+
+        @Override
         public String toString() { return "O-O-O"; } // Portable Game Notation Standard
     }
 
     // Class for handling invalid moves
     public static final class InvalidMove extends Move {
-        public InvalidMove() { super(null, -1); }
+        public InvalidMove() { super(null, 65); }
 
         @Override
         public Board execute() { throw new RuntimeException("Cannot execute an invalid move!"); }
+
+        @Override
+        public int getCurrentCoordinate() { return -1; }
     }
 
     public static class MoveFactory {

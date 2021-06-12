@@ -41,21 +41,14 @@ public class King extends Piece {
             if (BoardUtils.isValidTileCoordinate(possibleDestinationCoordinate)) {
                 final Tile possibleDestinationTile = board.getTile(possibleDestinationCoordinate);
                 if (!possibleDestinationTile.isTileOccupied()) {
-                    legalMoves.add(new NormalMove(
-                            board,
-                            this,
-                            possibleDestinationCoordinate)
-                    );
+                    legalMoves.add(new NormalMove(board, this, possibleDestinationCoordinate));
                 } else {
                     final Piece pieceAtDestination = possibleDestinationTile.getPiece();
                     final Alliance pieceAlliance = pieceAtDestination.getPieceAlliance();
 
                     if (pieceAlliance != this.pieceAlliance) {
-                        legalMoves.add(new AttackMove(
-                                board,
-                                this,
-                                possibleDestinationCoordinate,
-                                pieceAtDestination)
+                        legalMoves.add(new MajorAttackMove(board, this,
+                                possibleDestinationCoordinate, pieceAtDestination)
                         );
                     }
                 }

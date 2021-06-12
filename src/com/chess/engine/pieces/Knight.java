@@ -46,11 +46,7 @@ public class Knight extends Piece {
 
                 // if it is not occupied add a normal move
                 if (!possibleDestinationTile.isTileOccupied()) {
-                    legalMoves.add(new NormalMove(
-                            board,
-                            this,
-                            possibleDestinationCoordinates)
-                    );
+                    legalMoves.add(new NormalMove(board, this, possibleDestinationCoordinates));
                 // else get the tile piece color and type...
                 } else {
                     final Piece pieceAtDestination = possibleDestinationTile.getPiece();
@@ -58,11 +54,8 @@ public class Knight extends Piece {
 
                     // and if its a different color add an attack move
                     if (pieceAlliance != this.pieceAlliance) {
-                        legalMoves.add(new AttackMove(
-                                board,
-                                this,
-                                possibleDestinationCoordinates,
-                                pieceAtDestination)
+                        legalMoves.add(new MajorAttackMove(board, this,
+                                possibleDestinationCoordinates, pieceAtDestination)
                         );
                     }
                 }

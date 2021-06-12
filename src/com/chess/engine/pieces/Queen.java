@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static com.chess.engine.board.Move.*;
+
 public class Queen extends Piece {
     // For an explanation of the Queen Class
     // please refer to the Bishop Class
@@ -44,21 +46,14 @@ public class Queen extends Piece {
                     final Tile possibleDestinationTile = board.getTile(possibleDestinationCoordinates);
 
                     if (!possibleDestinationTile.isTileOccupied()) {
-                        legalMoves.add(new Move.NormalMove(
-                                board,
-                                this,
-                                possibleDestinationCoordinates)
-                        );
+                        legalMoves.add(new NormalMove(board, this, possibleDestinationCoordinates));
                     } else {
                         final Piece pieceAtDestination = possibleDestinationTile.getPiece();
                         final Alliance pieceAlliance = pieceAtDestination.getPieceAlliance();
 
                         if (pieceAlliance != this.pieceAlliance) {
-                            legalMoves.add(new Move.AttackMove(
-                                    board,
-                                    this,
-                                    possibleDestinationCoordinates,
-                                    pieceAtDestination)
+                            legalMoves.add(new MajorAttackMove(board, this,
+                                    possibleDestinationCoordinates, pieceAtDestination)
                             );
                         }
 

@@ -16,15 +16,15 @@ public abstract class Player {
     protected final Board board;
     protected final King playerKing;
     protected final Collection<Move> legalMoves;
-    private final boolean isInCheck;
+    protected final boolean isInCheck;
 
     Player(final Board board,
-           final Collection<Move> legalMoves,
+           final Collection<Move> playerLegals,
            final Collection<Move> opponentMoves) {
         this.board = board;
         this.playerKing = establishKing();
-        this.legalMoves = ImmutableList.copyOf(Iterables.concat(legalMoves, calculateKingCastles(legalMoves, opponentMoves)));
-        this.isInCheck = !Player.calculateAttackOnTile(this.playerKing.getPiecePosition(), opponentMoves).isEmpty();
+        this.isInCheck = !calculateAttackOnTile(this.playerKing.getPiecePosition(), opponentMoves).isEmpty();
+        this.legalMoves = ImmutableList.copyOf(Iterables.concat(playerLegals, calculateKingCastles(playerLegals, opponentMoves)));
     }
 
     // Expose fields
@@ -52,18 +52,22 @@ public abstract class Player {
     // if a king is found return it
     // if not throw a runtime exception
     private King establishKing() {
+        King result = null;
         for (final Piece piece : getActivePieces()) {
             if (piece.getPieceType().isKing()) {
-                return (King) piece;
+                result = (King) piece;
+                break;
             }
         }
-        throw new RuntimeException("Not a valid board!");
+        if (result == null) {
+            throw new RuntimeException("Not a valid board!");
+        }
+        return result;
     }
 
     // Method for checking is a move is contained in
     // the collection of moves
     public boolean isMoveLegal(final Move move) { return this.legalMoves.contains(move); }
-
     public boolean isInCheck() { return this.isInCheck; } // Method for checking if you're in check
     public boolean isInCheckMate() { return this.isInCheck && !hasEscapeMoves(); } // Method for checking if you're in checkmate
 

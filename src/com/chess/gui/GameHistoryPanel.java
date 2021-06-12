@@ -20,6 +20,7 @@ public class GameHistoryPanel extends JFrame {
         this.setTitle("Move History");
         this.setLayout(new BorderLayout());
         this.setSize(300, 600);
+        this.setResizable(false);
         this.model = new DataModel();
         final JTable table = new JTable(model);
         table.setRowHeight(15);

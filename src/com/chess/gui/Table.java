@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static com.chess.engine.board.Move.*;
+import static com.chess.engine.board.Move.MoveFactory;
 import static javax.swing.SwingUtilities.isLeftMouseButton;
 import static javax.swing.SwingUtilities.isRightMouseButton;
 
@@ -31,7 +31,7 @@ public class Table {
     private final JFrame gameFrame;
     private final GameHistoryPanel gameHistoryPanel;
     private final TakenPiecesPanel takenPiecesPanel;
-    private final Test test;
+    private final JFrame takenPiecesFrame;
     private final BoardPanel boardPanel;
     private final MoveLog moveLog;
     private Board chessBoard;
@@ -62,14 +62,18 @@ public class Table {
         this.chessBoard = Board.createStandardBoard();
         this.gameHistoryPanel = new GameHistoryPanel();
         this.takenPiecesPanel = new TakenPiecesPanel();
-        this.test = new Test();
+        this.takenPiecesFrame = new JFrame("Taken Pieces");
+        this.takenPiecesFrame.setResizable(false);
+        this.takenPiecesFrame.setLayout(new BorderLayout());
+        this.takenPiecesFrame.setSize(300, 600);
+        this.takenPiecesFrame.add(this.takenPiecesPanel);
+        this.takenPiecesFrame.setVisible(true);
         this.boardPanel = new BoardPanel();
         this.moveLog = new MoveLog();
         this.boardDirection = BoardDirection.NORMAL;
         this.highlightMoves = false;
         //this.gameFrame.add(this.takenPiecesPanel, BorderLayout.WEST);
         this.gameFrame.add(this.boardPanel, BorderLayout.CENTER);
-        //this.gameFrame.add(this.gameHistoryPanel, BorderLayout.EAST);
         this.gameFrame.setVisible(true);
     }
 
@@ -133,6 +137,7 @@ public class Table {
     private JMenu createDevMenu() {
         final JMenu devMenu = new JMenu("Dev");
         final JCheckBoxMenuItem openHistory = new JCheckBoxMenuItem("Move History Panel", true);
+        final JCheckBoxMenuItem openTaken = new JCheckBoxMenuItem("Taken Pieces Panel", true);
 
         openHistory.addActionListener(new ActionListener() {
             @Override
@@ -145,6 +150,18 @@ public class Table {
             }
         });
         devMenu.add(openHistory);
+
+        openTaken.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!openTaken.isSelected()) {
+                    takenPiecesFrame.setVisible(false);
+                } else if (openTaken.isSelected()) {
+                    takenPiecesFrame.setVisible(true);
+                }
+            }
+        });
+        devMenu.add(openTaken);
 
         return devMenu;
     }
@@ -251,7 +268,6 @@ public class Table {
                             public void run() {
                                 gameHistoryPanel.redo(chessBoard, moveLog);
                                 takenPiecesPanel.redo(moveLog);
-                                test.redo(moveLog);
                                 boardPanel.drawBoard(chessBoard);
                             }
                         });
