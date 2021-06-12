@@ -36,15 +36,13 @@ public abstract class Player {
     // If an enemy move overlaps the king's tile position
     // Add it to the attack moves list and return it
     // If the list is not empty the player is in check
-    protected static Collection<Move> calculateAttackOnTile(int piecePosition, Collection<Move> moves) {
+    protected static Collection<Move> calculateAttackOnTile(final int piecePosition, final Collection<Move> moves) {
         final List<Move> attackMoves = new ArrayList<>();
-
         for (final Move move : moves) {
             if (piecePosition == move.getDestinationCoordinate()) {
                 attackMoves.add(move);
             }
         }
-
         return ImmutableList.copyOf(attackMoves);
     }
 
@@ -99,10 +97,9 @@ public abstract class Player {
 
         final Board transitionBoard = move.execute();
 
-        final Collection<Move> kingAttacks = Player.calculateAttackOnTile(transitionBoard
-                .currentPlayer().getPlayerKing().getPiecePosition(),
-                transitionBoard.currentPlayer().getLegalMoves()
-        );
+        final Collection<Move> kingAttacks =
+                Player.calculateAttackOnTile(transitionBoard.currentPlayer().getOpponent().getPlayerKing().getPiecePosition(),
+                        transitionBoard.currentPlayer().getLegalMoves());
 
         if (!kingAttacks.isEmpty()) {
             return new MakeTransition(this.board, move, MoveStatus.CHECK);
