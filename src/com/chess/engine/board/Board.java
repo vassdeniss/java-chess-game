@@ -20,11 +20,14 @@ public class Board {
     private final BlackPlayer blackPlayer;
     private final Player currentPlayer;
 
+    private final Pawn enPassantPawn;
+
     // Board Constructor
     private Board(final Builder builder) {
         this.gameBoard = createGameBoard(builder);
         this.whitePieces = calculateActivePieces(this.gameBoard, Alliance.WHITE);
         this.blackPieces = calculateActivePieces(this.gameBoard, Alliance.BLACK);
+        this.enPassantPawn = builder.enPassantPawn;
         final Collection<Move> standardWhiteMoves = calculateLegalMoves(this.whitePieces);
         final Collection<Move> standardBlackMoves = calculateLegalMoves(this.blackPieces);
         this.whitePlayer = new WhitePlayer(this, standardWhiteMoves, standardBlackMoves);
@@ -59,6 +62,7 @@ public class Board {
     public Player currentPlayer() { return this.currentPlayer; }
     public Collection<Piece> getBlackPieces() { return this.blackPieces; }
     public Collection<Piece> getWhitePieces() { return this.whitePieces; }
+    public Pawn getEnPassantPawn() { return this.enPassantPawn; }
 
     // Method for making a list of all legal moves by looping through
     // the pieces and taking each ones moves and adding it to a list

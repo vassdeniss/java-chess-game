@@ -26,7 +26,6 @@ public class Pawn extends Piece {
     @Override
     public Collection<Move> legalMoves(final Board board) {
         final List<Move> legalMoves = new ArrayList<>();
-
         // Loop through all possible moves
         // Note*: 8 is normal move, 16 is jump, 7 and 9 are diagonal attack moves
         for (final int currentPossibleMove : POSSIBLE_MOVE_COORDINATES) {
@@ -34,12 +33,17 @@ public class Pawn extends Piece {
             // if the tile is valid continue
             if (!BoardUtils.isValidTileCoordinate(possibleDestinationCoordinate)) { continue; }
             // if the move is 8 (normal) and the tile is not occupied
-            // add a normal move
+            // check if the tile is a pawn promotion tile and promote it
+            // otherwise add a normal move
             if (currentPossibleMove == 8 && !board.getTile(possibleDestinationCoordinate).isTileOccupied()) {
-                legalMoves.add(new PawnMove(board, this, possibleDestinationCoordinate));
-                // Determine the move is 16 (jump) (only executable on first move)
-                // Then determine wheres the pawn i.e if its black and on second row or
-                // white on seventh row
+                if (this.pieceAlliance.isPawnPromotionTile(possibleDestinationCoordinate)) {
+                    legalMoves.add(new PawnPromotion(new PawnMove(board, this, possibleDestinationCoordinate)));
+                } else {
+                    legalMoves.add(new PawnMove(board, this, possibleDestinationCoordinate));
+                }
+            // Determine the move is 16 (jump) (only executable on first move)
+            // Then determine wheres the pawn i.e if its black and on second row or
+            // white on seventh row
             } else if (currentPossibleMove == 16 && this.isFirstMove() &&
                     ((BoardUtils.SEVENTH_RANK[this.piecePosition] && this.pieceAlliance.isBlack())
                             || (BoardUtils.SECOND_RANK[this.piecePosition] && this.pieceAlliance.isWhite()))) {
@@ -59,12 +63,28 @@ public class Pawn extends Piece {
             } else if (currentPossibleMove == 7 &&
                     !((BoardUtils.EIGHT_COLUMN[this.piecePosition] && this.pieceAlliance.isWhite()) ||
                             (BoardUtils.FIRST_COLUMN[this.piecePosition] && this.pieceAlliance.isBlack()))) {
-                // if the tile is occupied add an attack move
+                // if the tile is occupied check if the tile is a pawn promotion tile and promote it
+                // otherwise add a normal move
                 if (board.getTile(possibleDestinationCoordinate).isTileOccupied()) {
-                    final Piece pieceAtTile = board.getTile(possibleDestinationCoordinate).getPiece();
-                    if (this.pieceAlliance != pieceAtTile.getPieceAlliance()) {
-                        legalMoves.add(new PawnAttackMove(board, this,
-                                possibleDestinationCoordinate, pieceAtTile)
+                    final Piece pieceOnTile = board.getTile(possibleDestinationCoordinate).getPiece();
+                    if (this.pieceAlliance != pieceOnTile.getPieceAlliance()) {
+                        if (this.pieceAlliance.isPawnPromotionTile(possibleDestinationCoordinate)) {
+                            legalMoves.add(new PawnPromotion(new PawnAttackMove(board, this,
+                                    possibleDestinationCoordinate, pieceOnTile))
+                            );
+                        } else {
+                            legalMoves.add(new PawnAttackMove(board, this,
+                                    possibleDestinationCoordinate, pieceOnTile)
+                            );
+                        }
+                    }
+                // if an en passant pawn exists calculate the possible capture move
+                } else if (board.getEnPassantPawn() != null && board.getEnPassantPawn().getPiecePosition() ==
+                        (this.piecePosition + (this.pieceAlliance.getOppositeDirection()))) {
+                    final Piece pieceOnCandidate = board.getEnPassantPawn();
+                    if (this.pieceAlliance != pieceOnCandidate.getPieceAlliance()) {
+                        legalMoves.add(new PawnEnPassantAttackMove(board, this,
+                                possibleDestinationCoordinate, pieceOnCandidate)
                         );
                     }
                 }
@@ -75,12 +95,28 @@ public class Pawn extends Piece {
             } else if (currentPossibleMove == 9 &&
                     !((BoardUtils.EIGHT_COLUMN[this.piecePosition] && this.pieceAlliance.isBlack()) ||
                             (BoardUtils.FIRST_COLUMN[this.piecePosition] && this.pieceAlliance.isWhite()))) {
-                // if the tile is occupied add an attack move
+                // if the tile is occupied check if the tile is a pawn promotion tile and promote it
+                // otherwise add a normal move
                 if (board.getTile(possibleDestinationCoordinate).isTileOccupied()) {
-                    final Piece pieceAtTile = board.getTile(possibleDestinationCoordinate).getPiece();
-                    if (this.pieceAlliance != pieceAtTile.getPieceAlliance()) {
-                        legalMoves.add(new PawnAttackMove(board, this,
-                                possibleDestinationCoordinate, pieceAtTile)
+                    final Piece pieceOnTile = board.getTile(possibleDestinationCoordinate).getPiece();
+                    if (this.pieceAlliance != pieceOnTile.getPieceAlliance()) {
+                        if (this.pieceAlliance.isPawnPromotionTile(possibleDestinationCoordinate)) {
+                            legalMoves.add(new PawnPromotion(new PawnAttackMove(board, this,
+                                    possibleDestinationCoordinate, pieceOnTile))
+                            );
+                        } else {
+                            legalMoves.add(new PawnAttackMove(board, this,
+                                    possibleDestinationCoordinate, pieceOnTile)
+                            );
+                        }
+                    }
+                // if an en passant pawn exists calculate the possible capture move
+                } else if (board.getEnPassantPawn() != null && board.getEnPassantPawn().getPiecePosition() ==
+                        (this.piecePosition - (this.pieceAlliance.getOppositeDirection()))) {
+                    final Piece pieceOnCandidate = board.getEnPassantPawn();
+                    if (this.pieceAlliance != pieceOnCandidate.getPieceAlliance()) {
+                        legalMoves.add(new PawnEnPassantAttackMove(board, this,
+                                possibleDestinationCoordinate, pieceOnCandidate)
                         );
                     }
                 }
@@ -96,4 +132,8 @@ public class Pawn extends Piece {
 
     @Override
     public String toString() { return pieceType.PAWN.toString(); }
+
+    public Piece getPromotionPiece() {
+        return new Queen(this.piecePosition, this.pieceAlliance, false);
+    }
 }
