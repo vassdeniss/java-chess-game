@@ -68,6 +68,8 @@ public abstract class Player {
     public boolean isMoveLegal(final Move move) { return this.legalMoves.contains(move); }
     public boolean isInCheck() { return this.isInCheck; } // Method for checking if you're in check
     public boolean isInCheckMate() { return this.isInCheck && !hasEscapeMoves(); } // Method for checking if you're in checkmate
+    public boolean isKingSideCastleCapable() { return this.playerKing.isKingSideCastleCapable(); }
+    public boolean isQueenSideCastleCapable() { return this.playerKing.isQueenSideCastleCapable(); }
 
     // Method for checking escape moves in case of checkmate
     // Loop through our possible moves
@@ -92,7 +94,7 @@ public abstract class Player {
     // Otherwise make the move and return a new board
     public MakeTransition makeMove(final Move move) {
         if (!isMoveLegal(move)) {
-            return new MakeTransition(this.board, move, MoveStatus.ILLEGAL);
+            return new MakeTransition(this.board, this.board, move, MoveStatus.ILLEGAL);
         }
 
         final Board transitionBoard = move.execute();
@@ -102,14 +104,22 @@ public abstract class Player {
                         transitionBoard.currentPlayer().getLegalMoves());
 
         if (!kingAttacks.isEmpty()) {
-            return new MakeTransition(this.board, move, MoveStatus.CHECK);
+            return new MakeTransition(this.board, this.board, move, MoveStatus.CHECK);
         }
 
-        return new MakeTransition(transitionBoard, move, MoveStatus.DONE);
+        return new MakeTransition(this.board, transitionBoard, move, MoveStatus.DONE);
+    }
+
+    public MakeTransition unMakeMove(final Move move) {
+        return new MakeTransition(this.board, move.undo(), move, MoveStatus.DONE);
     }
 
     public abstract Collection<Piece> getActivePieces();
     public abstract Alliance getAlliance();
     public abstract Player getOpponent();
     protected abstract Collection<Move> calculateKingCastles(Collection<Move> playerLegals, Collection<Move> opponentsLegals);
+    protected boolean hasCastleOpportunities() {
+        return !this.isInCheck && !this.playerKing.isCastled() &&
+                (this.playerKing.isKingSideCastleCapable() || this.playerKing.isQueenSideCastleCapable());
+    }
 }

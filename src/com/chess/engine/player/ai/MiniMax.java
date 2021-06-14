@@ -1,94 +1,126 @@
 package com.chess.engine.player.ai;
 
 import com.chess.engine.board.Board;
+import com.chess.engine.board.BoardUtils;
 import com.chess.engine.board.Move;
 import com.chess.engine.player.MakeTransition;
 
-public class MiniMax implements MoveStrategy {
-    private final BoardEvaluator boardEvaluator;
+import java.util.concurrent.atomic.AtomicLong;
+
+import static com.chess.engine.board.Move.*;
+
+public final class MiniMax implements MoveStrategy {
+
+    private final BoardEvaluator evaluator;
     private final int searchDepth;
+    private long boardsEvaluated;
+    private long executionTime;
+    private FreqTableRow[] freqTable;
+    private int freqTableIndex;
 
     public MiniMax(final int searchDepth) {
-        this.boardEvaluator = new StandardBoardEvaluator();
+        this.evaluator = StandardBoardEvaluator.get();
+        this.boardsEvaluated = 0;
         this.searchDepth = searchDepth;
     }
 
     @Override
     public String toString() { return "MiniMax"; }
-
     @Override
-    public Move execute(Board board) {
+    public long getNumBoardsEvaluated() { return this.boardsEvaluated; }
+
+    public Move execute(final Board board) {
         final long startTime = System.currentTimeMillis();
-        Move bestMove = null;
+        Move bestMove = MoveFactory.getNullMove();
         int highestSeenValue = Integer.MIN_VALUE;
         int lowestSeenValue = Integer.MAX_VALUE;
         int currentValue;
-
-        System.out.println(board.currentPlayer() + " THINKING with depth = " + this.searchDepth);
-
-        int numMoves = board.currentPlayer().getLegalMoves().size();
-
+        this.freqTable = new FreqTableRow[board.currentPlayer().getLegalMoves().size()];
+        this.freqTableIndex = 0;
+        int moveCounter = 1;
+        final int numMoves = board.currentPlayer().getLegalMoves().size();
         for (final Move move : board.currentPlayer().getLegalMoves()) {
             final MakeTransition makeTransition = board.currentPlayer().makeMove(move);
             if (makeTransition.getMoveStatus().isDone()) {
+                final FreqTableRow row = new FreqTableRow(move);
+                this.freqTable[this.freqTableIndex] = row;
                 currentValue = board.currentPlayer().getAlliance().isWhite() ?
-                        min(makeTransition.getTransitionBoard(), this.searchDepth - 1) :
-                        max(makeTransition.getTransitionBoard(), this.searchDepth - 1);
-                if (board.currentPlayer().getAlliance().isWhite() && currentValue >= highestSeenValue) {
+                        min(makeTransition.getToBoard(), this.searchDepth - 1) :
+                        max(makeTransition.getToBoard(), this.searchDepth - 1);
+                this.freqTableIndex++;
+                if (board.currentPlayer().getAlliance().isWhite() &&
+                        currentValue >= highestSeenValue) {
                     highestSeenValue = currentValue;
                     bestMove = move;
-                } else if (board.currentPlayer().getAlliance().isBlack() && currentValue <= lowestSeenValue) {
+                } else if (board.currentPlayer().getAlliance().isBlack() &&
+                        currentValue <= lowestSeenValue) {
                     lowestSeenValue = currentValue;
                     bestMove = move;
                 }
             }
+            moveCounter++;
         }
-
-        final long executionTime = System.currentTimeMillis() - startTime;
-
+        this.executionTime = System.currentTimeMillis() - startTime;
         return bestMove;
     }
 
-    public int min(final Board board, final int depth) {
-        // Variable for lowest seen value
+    private int min(final Board board,
+                    final int depth) {
+        if (depth == 0) {
+            this.boardsEvaluated++;
+            this.freqTable[this.freqTableIndex].increment();
+            return this.evaluator.evaluate(board, depth);
+        }
+        if (isEndGameScenario(board)) { return this.evaluator.evaluate(board, depth); }
         int lowestSeenValue = Integer.MAX_VALUE;
-        if (depth == 0 || isEndGameScenario(board)) { return this.boardEvaluator.evaluate(board, depth); }
-        // Loop through every move of the current player
         for (final Move move : board.currentPlayer().getLegalMoves()) {
             final MakeTransition makeTransition = board.currentPlayer().makeMove(move);
-            // Make every move
             if (makeTransition.getMoveStatus().isDone()) {
-                final int currentValue = max(makeTransition.getTransitionBoard(), depth - 1);
-                // Evaluate the move to the lowest value and update if necessary
-                if (currentValue <= lowestSeenValue) {
-                    lowestSeenValue = currentValue;
-                }
+                final int currentValue = max(makeTransition.getToBoard(), depth - 1);
+                if (currentValue <= lowestSeenValue) { lowestSeenValue = currentValue; }
             }
         }
         return lowestSeenValue;
     }
 
-    public int max(final Board board, final int depth) {
-        // Variable for highest seen value
+    private int max(final Board board,
+                    final int depth) {
+        if (depth == 0) {
+            this.boardsEvaluated++;
+            this.freqTable[this.freqTableIndex].increment();
+            return this.evaluator.evaluate(board, depth);
+        }
+        if (isEndGameScenario(board)) { return this.evaluator.evaluate(board, depth); }
         int highestSeenValue = Integer.MIN_VALUE;
-        if (depth == 0 || isEndGameScenario(board)) { return this.boardEvaluator.evaluate(board, depth); }
-        // Loop through every move of the current player
         for (final Move move : board.currentPlayer().getLegalMoves()) {
             final MakeTransition makeTransition = board.currentPlayer().makeMove(move);
-            // Make every move
             if (makeTransition.getMoveStatus().isDone()) {
-                final int currentValue = min(makeTransition.getTransitionBoard(), depth - 1);
-                // Evaluate the move to the highest value and update if necessary
-                if (currentValue >= highestSeenValue) {
-                    highestSeenValue = currentValue;
-                }
+                final int currentValue = min(makeTransition.getToBoard(), depth - 1);
+                if (currentValue >= highestSeenValue) { highestSeenValue = currentValue; }
             }
         }
         return highestSeenValue;
     }
 
     private static boolean isEndGameScenario(final Board board) {
-        return board.currentPlayer().isInCheckMate() ||
-               board.currentPlayer().getOpponent().isInCheckMate();
+        return board.currentPlayer().isInCheckMate() || board.currentPlayer().isInStaleMate();
+    }
+
+    private static class FreqTableRow {
+        private final Move move;
+        private final AtomicLong count;
+
+        FreqTableRow(final Move move) {
+            this.count = new AtomicLong();
+            this.move = move;
+        }
+
+        void increment() { this.count.incrementAndGet(); }
+
+        @Override
+        public String toString() {
+            return BoardUtils.INSTANCE.getPositionAtCoordinate(this.move.getCurrentCoordinate()) +
+                    BoardUtils.INSTANCE.getPositionAtCoordinate(this.move.getDestinationCoordinate()) + " : " + this.count;
+        }
     }
 }

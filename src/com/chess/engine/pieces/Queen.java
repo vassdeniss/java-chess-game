@@ -28,6 +28,9 @@ public class Queen extends Piece {
     }
 
     @Override
+    public int locationBonus() { return this.pieceAlliance.queenBonus(this.piecePosition); }
+
+    @Override
     public Collection<Move> legalMoves(final Board board) {
         final List<Move> legalMoves = new ArrayList<>();
 
@@ -76,7 +79,7 @@ public class Queen extends Piece {
 
     // Queen Exclusions
     private static boolean isFirstColumnExclusion(final int currentPosition, final int possibleOffset) {
-        return BoardUtils.FIRST_COLUMN[currentPosition] && (
+        return BoardUtils.INSTANCE.FIRST_COLUMN.get(currentPosition) && (
                 possibleOffset == -9
                 || possibleOffset == 7
                 || possibleOffset == -1
@@ -84,7 +87,7 @@ public class Queen extends Piece {
     }
 
     private static boolean isEightColumnExclusion(final int currentPosition, final int possibleOffset) {
-        return BoardUtils.EIGHT_COLUMN[currentPosition] && (
+        return BoardUtils.INSTANCE.EIGHTH_COLUMN.get(currentPosition) && (
                 possibleOffset == 9
                 || possibleOffset == -7
                 || possibleOffset == 1

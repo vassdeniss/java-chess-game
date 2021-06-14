@@ -9,8 +9,13 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.chess.engine.board.Move.*;
 
 public class Board {
+    private final Map<Integer, Piece> boardConfiguration; // Map for pieces and positions
     private final List<Tile> gameBoard; // List of tiles for the game board
     // Collection of white || black pieces
     private final Collection<Piece> whitePieces;
@@ -19,11 +24,12 @@ public class Board {
     private final WhitePlayer whitePlayer;
     private final BlackPlayer blackPlayer;
     private final Player currentPlayer;
-
     private final Pawn enPassantPawn;
+    private final Move transitionMove;
 
     // Board Constructor
     private Board(final Builder builder) {
+        this.boardConfiguration = Collections.unmodifiableMap(builder.boardConfiguration);
         this.gameBoard = createGameBoard(builder);
         this.whitePieces = calculateActivePieces(this.gameBoard, Alliance.WHITE);
         this.blackPieces = calculateActivePieces(this.gameBoard, Alliance.BLACK);
@@ -33,6 +39,7 @@ public class Board {
         this.whitePlayer = new WhitePlayer(this, standardWhiteMoves, standardBlackMoves);
         this.blackPlayer = new BlackPlayer(this, standardWhiteMoves, standardBlackMoves);
         this.currentPlayer = builder.nextMoveDecider.choosePlayer(this.whitePlayer, this.blackPlayer);
+        this.transitionMove = builder.transitionMove != null ? builder.transitionMove : MoveFactory.getNullMove();
     }
 
     @Override
@@ -63,6 +70,11 @@ public class Board {
     public Collection<Piece> getBlackPieces() { return this.blackPieces; }
     public Collection<Piece> getWhitePieces() { return this.whitePieces; }
     public Pawn getEnPassantPawn() { return this.enPassantPawn; }
+    public Collection<Piece> getAllPieces() {
+        return Stream.concat(this.whitePieces.stream(), this.blackPieces.stream()).collect(Collectors.toList());
+    }
+    public Piece getPiece(final int coordinate) { return this.boardConfiguration.get(coordinate); }
+    public Move getTransitionMove() { return this.transitionMove; }
 
     // Method for making a list of all legal moves by looping through
     // the pieces and taking each ones moves and adding it to a list
@@ -121,7 +133,7 @@ public class Board {
         builder.setPiece(new Knight(1, Alliance.BLACK));
         builder.setPiece(new Bishop(2, Alliance.BLACK));
         builder.setPiece(new Queen(3, Alliance.BLACK));
-        builder.setPiece(new King(4, Alliance.BLACK));
+        builder.setPiece(new King(4, Alliance.BLACK, true, true));
         builder.setPiece(new Bishop(5, Alliance.BLACK));
         builder.setPiece(new Knight(6, Alliance.BLACK));
         builder.setPiece(new Rook(7, Alliance.BLACK));
@@ -147,7 +159,7 @@ public class Board {
         builder.setPiece(new Knight(57, Alliance.WHITE));
         builder.setPiece(new Bishop(58, Alliance.WHITE));
         builder.setPiece(new Queen(59, Alliance.WHITE));
-        builder.setPiece(new King(60, Alliance.WHITE));
+        builder.setPiece(new King(60, Alliance.WHITE, true, true));
         builder.setPiece(new Bishop(61, Alliance.WHITE));
         builder.setPiece(new Knight(62, Alliance.WHITE));
         builder.setPiece(new Rook(63, Alliance.WHITE));
@@ -166,6 +178,7 @@ public class Board {
         Map<Integer, Piece> boardConfiguration; // Map containing the positions of each piece
         Alliance nextMoveDecider;
         Pawn enPassantPawn;
+        Move transitionMove;
 
         public Builder() { this.boardConfiguration = new HashMap<>(); } // Constructor
 
@@ -182,7 +195,13 @@ public class Board {
             return this;
         }
 
-        public Board build() { return new Board(this); } // Return the built board
         public void setEnPassantPawn(Pawn enPassantPawn) { this.enPassantPawn = enPassantPawn; }
+
+        public Builder setMakeTransition(final Move transitionMove) {
+            this.transitionMove = transitionMove;
+            return this;
+        }
+
+        public Board build() { return new Board(this); } // Return the built board
     }
 }

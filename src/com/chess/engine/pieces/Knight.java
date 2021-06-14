@@ -26,6 +26,9 @@ public class Knight extends Piece {
     }
 
     @Override
+    public int locationBonus() { return this.pieceAlliance.knightBonus(this.piecePosition); }
+
+    @Override
     public Collection<Move> legalMoves(final Board board) {
         final List<Move> legalMoves = new ArrayList<>();
 
@@ -76,7 +79,7 @@ public class Knight extends Piece {
 
     // Knight Exclusions
     private static boolean isFirstColumnExclusion(final int currentPosition, final int possibleOffset) {
-        return BoardUtils.FIRST_COLUMN[currentPosition] && (
+        return BoardUtils.INSTANCE.FIRST_COLUMN.get(currentPosition) && (
                 possibleOffset == -17
                 || possibleOffset == -10
                 || possibleOffset == 6
@@ -85,21 +88,21 @@ public class Knight extends Piece {
     }
 
     private static boolean isSecondColumnExclusion(final int currentPosition, final int possibleOffset) {
-        return BoardUtils.SECOND_COLUMN[currentPosition] && (
+        return BoardUtils.INSTANCE.SECOND_COLUMN.get(currentPosition) && (
                 possibleOffset == -10
                 || possibleOffset == 6
         );
     }
 
     private static boolean isSeventhColumnExclusion(final int currentPosition, final int possibleOffset) {
-        return BoardUtils.SEVENTH_COLUMN[currentPosition] && (
+        return BoardUtils.INSTANCE.SEVENTH_COLUMN.get(currentPosition) && (
                 possibleOffset == -6
                 || possibleOffset == 10
         );
     }
 
     private static boolean isEightColumnExclusion(final int currentPosition, final int possibleOffset) {
-        return BoardUtils.EIGHT_COLUMN[currentPosition] && (
+        return BoardUtils.INSTANCE.EIGHTH_COLUMN.get(currentPosition) && (
                 possibleOffset == 10
                 || possibleOffset == 17
         );

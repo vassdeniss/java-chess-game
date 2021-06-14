@@ -48,6 +48,7 @@ public abstract class Piece {
     public boolean isFirstMove() { return this.isFirstMove; } // Method that returns true if its the first move
     public PieceType getPieceType() { return this.pieceType; } // Method that returns the piece type
     public int getPieceValue() { return this.pieceType.getPieceValue(); } // Method that returns the piece value
+    public abstract int locationBonus(); // Abstract method for bonus points in evaluation
 
     // Abstract list each piece will inherit and each will be filled
     // with legal moves for the specific piece
@@ -86,7 +87,7 @@ public abstract class Piece {
             @Override
             public boolean isRook() { return false; }
         },
-        KING("k", 10000) {
+        KING("K", 10000) {
             @Override
             public boolean isKing() { return true; }
             @Override

@@ -28,6 +28,9 @@ public class Rook extends Piece {
     }
 
     @Override
+    public int locationBonus() { return this.pieceAlliance.rookBonus(this.piecePosition); }
+
+    @Override
     public Collection<Move> legalMoves(final Board board) {
         final List<Move> legalMoves = new ArrayList<>();
 
@@ -76,10 +79,10 @@ public class Rook extends Piece {
 
     // Rook Exclusions
     private static boolean isFirstColumnExclusion(final int currentPosition, final int possibleOffset) {
-        return BoardUtils.FIRST_COLUMN[currentPosition] && (possibleOffset == -1);
+        return BoardUtils.INSTANCE.FIRST_COLUMN.get(currentPosition) && (possibleOffset == -1);
     }
 
     private static boolean isEightColumnExclusion(final int currentPosition, final int possibleOffset) {
-        return BoardUtils.EIGHT_COLUMN[currentPosition] && (possibleOffset == 1);
+        return BoardUtils.INSTANCE.EIGHTH_COLUMN.get(currentPosition) && (possibleOffset == 1);
     }
 }

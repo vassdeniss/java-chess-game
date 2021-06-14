@@ -27,6 +27,9 @@ public class Bishop extends Piece {
     }
 
     @Override
+    public int locationBonus() { return this.pieceAlliance.bishopBonus(this.piecePosition); }
+
+    @Override
     public Collection<Move> legalMoves(final Board board) {
         final List<Move> legalMoves = new ArrayList<>();
 
@@ -80,14 +83,14 @@ public class Bishop extends Piece {
 
     // Bishop Exclusions
     private static boolean isFirstColumnExclusion(final int currentPosition, final int possibleOffset) {
-        return BoardUtils.FIRST_COLUMN[currentPosition] && (
+        return BoardUtils.INSTANCE.FIRST_COLUMN.get(currentPosition) && (
                 possibleOffset == -9
                 || possibleOffset == 7
         );
     }
 
     private static boolean isEightColumnExclusion(final int currentPosition, final int possibleOffset) {
-        return BoardUtils.EIGHT_COLUMN[currentPosition] && (
+        return BoardUtils.INSTANCE.EIGHTH_COLUMN.get(currentPosition) && (
                 possibleOffset == 9
                 || possibleOffset == -7
         );

@@ -15,9 +15,11 @@ public class GameHistoryPanel extends JFrame {
     private final DataModel model;
     private final JScrollPane scrollPane;
     private static final Dimension HISTORY_PANEL_DIMENSION = new Dimension(100, 400);
+    ImageIcon icon = new ImageIcon(ClassLoader.getSystemResource("icon.png"));
 
     GameHistoryPanel() {
         this.setTitle("Move History");
+        this.setIconImage(icon.getImage());
         this.setLayout(new BorderLayout());
         this.setSize(300, 600);
         this.setResizable(false);
