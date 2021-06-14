@@ -4,13 +4,10 @@ import com.chess.engine.board.Move;
 import com.chess.engine.pieces.Piece;
 import com.google.common.primitives.Ints;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -61,40 +58,30 @@ public class TakenPiecesPanel extends JPanel {
             }
         });
 
-        Collections.sort(blackTakenPieces, new Comparator<Piece>() {
-            @Override
-            public int compare(final Piece o1, final Piece o2) {
-                return Ints.compare(o1.getPieceValue(), o2.getPieceValue());
-            }
-        });
+        Collections.sort(blackTakenPieces, (o1, o2) -> Ints.compare(o1.getPieceValue(), o2.getPieceValue()));
 
         for (final Piece takenPiece : whiteTakenPieces) {
-            try {
-                final BufferedImage image = ImageIO.read(new File("src/com/chess/art/pieces/"
-                        + takenPiece.getPieceAlliance().toString().substring(0, 1) + "" + takenPiece.toString()
-                        + ".png"));
-                final ImageIcon icon = new ImageIcon(image);
-                final JLabel imageLabel = new JLabel(new ImageIcon(icon.getImage().getScaledInstance(
-                        icon.getIconWidth() - 15, icon.getIconWidth() - 15, Image.SCALE_SMOOTH)));
-                this.southPanel.add(imageLabel);
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
+            StringBuilder path = new StringBuilder();
+            Character alliance = takenPiece.getPieceAlliance().toString().charAt(0);
+            String piece = takenPiece.toString();
+            path.append("pieces/"); path.append(alliance); path.append(piece); path.append(".png");
+            URL pieceImage = ClassLoader.getSystemResource(path.toString());
+            final ImageIcon icon = new ImageIcon(pieceImage);
+            final JLabel imageLabel = new JLabel(new ImageIcon(icon.getImage().getScaledInstance(
+                    icon.getIconWidth() - 15, icon.getIconWidth() - 15, Image.SCALE_SMOOTH)));
+            this.southPanel.add(imageLabel);
         }
 
         for (final Piece takenPiece : blackTakenPieces) {
-            try {
-                final BufferedImage image = ImageIO.read(new File("src/com/chess/art/pieces/"
-                        + takenPiece.getPieceAlliance().toString().substring(0, 1) + "" + takenPiece.toString()
-                        + ".png"));
-                final ImageIcon icon = new ImageIcon(image);
-                final JLabel imageLabel = new JLabel(new ImageIcon(icon.getImage().getScaledInstance(
-                        icon.getIconWidth() - 15, icon.getIconWidth() - 15, Image.SCALE_SMOOTH)));
-                this.northPanel.add(imageLabel);
-            }
-            catch (final IOException e) {
-                e.printStackTrace();
-            }
+            StringBuilder path = new StringBuilder();
+            Character alliance = takenPiece.getPieceAlliance().toString().charAt(0);
+            String piece = takenPiece.toString();
+            path.append("pieces/"); path.append(alliance); path.append(piece); path.append(".png");
+            URL pieceImage = ClassLoader.getSystemResource(path.toString());
+            final ImageIcon icon = new ImageIcon(pieceImage);
+            final JLabel imageLabel = new JLabel(new ImageIcon(icon.getImage().getScaledInstance(
+                    icon.getIconWidth() - 15, icon.getIconWidth() - 15, Image.SCALE_SMOOTH)));
+            this.northPanel.add(imageLabel);
         }
 
         validate();
